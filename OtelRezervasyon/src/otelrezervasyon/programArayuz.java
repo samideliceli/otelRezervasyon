@@ -5,6 +5,10 @@
  */
 package otelrezervasyon;
 
+
+
+import javax.swing.ImageIcon;
+
 /**
  *
  * @author delilog
@@ -21,10 +25,16 @@ public class programArayuz extends javax.swing.JFrame {
      */
     public programArayuz() {
         initComponents();
+        ImageIcon icon = new ImageIcon("/images/otel.png");
+        personelButon.setIcon(icon);
+        
+        System.out.println(new ImageIcon("/images/otel.png"));
+        
         tabbedPane.add("Müşteri", musteri);
         tabbedPane.add("Oda", oda);
         tabbedPane.add("Hizmetler",hizmet);
         tabbedPane.add("Muhasebe", muhasebe); 
+        
         
     }
 
@@ -39,9 +49,9 @@ public class programArayuz extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         tabbedPane = new javax.swing.JTabbedPane();
+        personelButon = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1368, 768));
 
         jLabel1.setText("GrayLight Termal Tesisleri");
 
@@ -52,16 +62,20 @@ public class programArayuz extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addContainerGap(224, Short.MAX_VALUE))
+                .addGap(50, 50, 50)
+                .addComponent(personelButon)
+                .addContainerGap(162, Short.MAX_VALUE))
             .addComponent(tabbedPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel1)
-                .addGap(68, 68, 68)
-                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE))
+                .addGap(15, 15, 15)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(personelButon))
+                .addGap(62, 62, 62)
+                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE))
         );
 
         pack();
@@ -104,6 +118,7 @@ public class programArayuz extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton personelButon;
     private javax.swing.JTabbedPane tabbedPane;
     // End of variables declaration//GEN-END:variables
 }
