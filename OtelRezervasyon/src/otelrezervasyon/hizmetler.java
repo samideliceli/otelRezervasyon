@@ -4,47 +4,79 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import static otelrezervasyon.dbConnection.con;
 import static otelrezervasyon.dbConnection.st;
 
 public class hizmetler extends javax.swing.JPanel {
 
     private dbConnection db;
-    private static int sutunSayisi;
-    private static int satirSayisi;
-    private static DefaultTableModel tb;
+    private int sutunSayisi, satirSayisi, i, satir, sutun;
+    private DefaultTableModel tb;
+    private Object sonDeger;
+    private Object[] row;
+    private Object[][] deger;
+    private String sutunAdi;
 
     public hizmetler() {
         initComponents();
         db = new dbConnection();
         db.dbBaglan();
+        tb = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                if (col == 0) {
+                    return false;
+                }
+                return true;
+            }
+        };
+        guncelle.setEnabled(false);
         try (ResultSet rs = st.executeQuery("SELECT * FROM SERVIS")) {
             sutunSayisi = rs.getMetaData().getColumnCount();
-            satirSayisi = rs.getRow();
-            tb = new DefaultTableModel();
-            for (int i = 1;
-                    i <= sutunSayisi;
-                    i++) {
-                tb.addColumn(rs.getMetaData().getColumnName(i));
+            for (int s = 1; s <= sutunSayisi; s++) {
+                tb.addColumn(rs.getMetaData().getColumnName(s));
             }
 
             while (rs.next()) {
-                Object[] row = new Object[sutunSayisi];
-                for (int i = 1; i <= sutunSayisi; i++) {
+                row = new Object[sutunSayisi];
+                for (i = 1; i <= sutunSayisi; i++) {
                     row[i - 1] = rs.getObject(i);
                 }
                 tb.addRow(row);
                 servisTablosu.setModel(tb);
-
+                satirSayisi = tb.getRowCount();
             }
-
             con.close();
         } catch (SQLException hata) {
             Logger.getLogger(OtelRezervasyon.class
                     .getName()).log(Level.SEVERE, null, hata);
         }
+        deger = new Object[satirSayisi][sutunSayisi];
+        for (satir = 0; satir < satirSayisi; satir++) {
+            for (sutun = 0; sutun < sutunSayisi; sutun++) {
+                deger[satir][sutun] = tb.getValueAt(satir, sutun);
+            }
+        }
+        tb.addTableModelListener(new TableModelListener() {
 
+            public void tableChanged(TableModelEvent e) {
+                satir = e.getFirstRow();
+                sutun = e.getColumn();
+                TableModel model = (TableModel) e.getSource();
+                sonDeger = model.getValueAt(satir, sutun);
+                sutunAdi = model.getColumnName(sutun);
+                if (sonDeger.equals(deger[satir][sutun])) {
+                    guncelle.setEnabled(false);
+                } else {
+                    guncelle.setEnabled(true);
+                }
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -81,29 +113,39 @@ public class hizmetler extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
-                .addGap(157, 157, 157)
+                .addGap(155, 155, 155)
                 .addComponent(guncelle)
-                .addContainerGap(162, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(44, 44, 44)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(guncelle)
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void guncelleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guncelleActionPerformed
-
-
+        db.dbBaglan();
+        try {
+            if (st.executeUpdate("UPDATE SERVIS SET " + sutunAdi + " = '" + sonDeger + "' WHERE " + sutunAdi + " = '" + deger[satir][sutun] + "'") != 0) {
+                JOptionPane.showMessageDialog(null, "Veri Başarıyla Güncellendi!");
+                deger[satir][sutun] = sonDeger;
+            } else {
+                JOptionPane.showMessageDialog(null, "Hata Oluştu!");
+            }
+            guncelle.setEnabled(false);
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(hizmetler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_guncelleActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton guncelle;
