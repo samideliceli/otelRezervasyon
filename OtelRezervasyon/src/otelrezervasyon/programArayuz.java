@@ -6,9 +6,6 @@
 package otelrezervasyon;
 
 
-
-import javax.swing.ImageIcon;
-
 /**
  *
  * @author delilog
@@ -19,21 +16,28 @@ public class programArayuz extends javax.swing.JFrame {
         odaIslemleri oda = new odaIslemleri();
         muhasebe muhasebe=new muhasebe();
         hizmetler hizmet= new hizmetler();
+        personelİslemleri personel=new personelİslemleri();
        
     /**
      * Creates new form programArayuz
      */
     public programArayuz() {
         initComponents();
-        ImageIcon icon = new ImageIcon("/images/otel.png");
-        personelButon.setIcon(icon);
         
-        System.out.println(new ImageIcon("/images/otel.png"));
+        personelButon.setIcon(new javax.swing.ImageIcon("src/images/otel.png"));
+        firsatButon.setIcon(new javax.swing.ImageIcon("src/images/advantage.png"));
+        jButton2.setIcon(new javax.swing.ImageIcon("src/images/notification.png"));
+        otel_logo.setIcon(new javax.swing.ImageIcon("src/images/hotelLogo.png"));
+        jLabel2.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
+        jLabel3.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
+        jLabel4.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
+        
         
         tabbedPane.add("Müşteri", musteri);
         tabbedPane.add("Oda", oda);
-        tabbedPane.add("Hizmetler",hizmet);
         tabbedPane.add("Muhasebe", muhasebe); 
+        tabbedPane.add("Personel",personel);
+        tabbedPane.add("Hizmetler",hizmet);
         
         
     }
@@ -50,36 +54,85 @@ public class programArayuz extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         tabbedPane = new javax.swing.JTabbedPane();
         personelButon = new javax.swing.JButton();
+        firsatButon = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        otel_logo = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(0, 127, 255));
+        setForeground(java.awt.Color.orange);
+        setIconImages(null);
 
-        jLabel1.setText("GrayLight Termal Tesisleri");
+        jLabel1.setFont(new java.awt.Font("DejaVu Sans Condensed", 1, 15)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(123, 120, 117));
+        jLabel1.setText("Graylight Otel");
+        jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+
+        firsatButon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                firsatButonActionPerformed(evt);
+            }
+        });
+
+        otel_logo.setMaximumSize(new java.awt.Dimension(175, 88));
+        otel_logo.setMinimumSize(new java.awt.Dimension(175, 88));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(tabbedPane)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(50, 50, 50)
-                .addComponent(personelButon)
-                .addContainerGap(162, Short.MAX_VALUE))
-            .addComponent(tabbedPane)
+                .addComponent(otel_logo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel4)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 492, Short.MAX_VALUE)
+                        .addComponent(personelButon)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(firsatButon)
+                        .addGap(9, 9, 9)
+                        .addComponent(jButton2)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(personelButon))
-                .addGap(62, 62, 62)
-                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(personelButon)
+                    .addComponent(firsatButon)
+                    .addComponent(jButton2)
+                    .addComponent(otel_logo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))))
+                .addGap(26, 26, 26)
+                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void firsatButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firsatButonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_firsatButonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -117,7 +170,13 @@ public class programArayuz extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton firsatButon;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel otel_logo;
     private javax.swing.JButton personelButon;
     private javax.swing.JTabbedPane tabbedPane;
     // End of variables declaration//GEN-END:variables
