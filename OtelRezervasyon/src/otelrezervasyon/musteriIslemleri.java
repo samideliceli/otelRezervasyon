@@ -5,6 +5,8 @@
  */
 package otelrezervasyon;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author delilog
@@ -126,8 +128,6 @@ public class musteriIslemleri extends javax.swing.JPanel {
                 .addGap(51, 51, 51))
         );
 
-        jLabel1.getAccessibleContext().setAccessibleName("Tip");
-
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Müşteri Listesi"));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -169,6 +169,11 @@ public class musteriIslemleri extends javax.swing.JPanel {
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jButton1.setText("Yeni Müşteri Ekle");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -223,6 +228,16 @@ public class musteriIslemleri extends javax.swing.JPanel {
     private void jTextField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField6ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField6ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       
+        
+    musteriEkle frame = new musteriEkle();
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    frame.pack();
+    frame.setVisible(true);
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

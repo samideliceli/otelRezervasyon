@@ -186,9 +186,6 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Tip"/>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Tip"/>
-          </AccessibilityProperties>
         </Component>
       </SubComponents>
     </Container>
@@ -277,6 +274,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Yeni M&#xfc;&#x15f;teri Ekle"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

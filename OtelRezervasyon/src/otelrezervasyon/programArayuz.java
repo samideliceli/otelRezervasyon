@@ -5,6 +5,9 @@
  */
 package otelrezervasyon;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 
 /**
  *
@@ -62,6 +65,7 @@ public class programArayuz extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("GRAYLIGHT");
         setBackground(new java.awt.Color(0, 127, 255));
         setForeground(java.awt.Color.orange);
         setIconImages(null);
@@ -71,9 +75,21 @@ public class programArayuz extends javax.swing.JFrame {
         jLabel1.setText("Graylight Otel");
         jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
+        personelButon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                personelButonActionPerformed(evt);
+            }
+        });
+
         firsatButon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 firsatButonActionPerformed(evt);
+            }
+        });
+
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
             }
         });
 
@@ -132,7 +148,33 @@ public class programArayuz extends javax.swing.JFrame {
 
     private void firsatButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firsatButonActionPerformed
         // TODO add your handling code here:
+        
+    JFrame frame = new JFrame ("Fırsatları Bildir");
+    frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+    frame.getContentPane().add (new fırsatlar());
+    frame.pack();
+    frame.setVisible (true);
     }//GEN-LAST:event_firsatButonActionPerformed
+
+    private void personelButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_personelButonActionPerformed
+        // TODO add your handling code here:
+        
+    JFrame frame = new JFrame ("Otel Bilgileri");
+    frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+    frame.getContentPane().add (new otelBilgileri());
+    frame.pack();
+    frame.setVisible (true);
+    }//GEN-LAST:event_personelButonActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        
+    JFrame frame = new JFrame ("Sorun Bildirme");
+    frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+    frame.getContentPane().add (new özelBildirim());
+    frame.pack();
+    frame.setVisible (true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
