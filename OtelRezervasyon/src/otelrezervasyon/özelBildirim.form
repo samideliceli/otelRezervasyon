@@ -17,7 +17,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace min="0" pref="12" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="20" max="32767" attributes="0"/>
               <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
@@ -28,7 +28,7 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace pref="26" max="32767" attributes="0"/>
+              <EmptySpace pref="34" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="jPanel1" max="32767" attributes="0"/>
                   <Component id="jPanel2" max="32767" attributes="0"/>
@@ -44,8 +44,8 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Bildirim Ekle">
-              <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
-                <LineBorder/>
+              <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder/>
               </Border>
             </TitledBorder>
           </Border>
@@ -98,8 +98,8 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Bildirimler">
-              <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
-                <LineBorder/>
+              <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder/>
               </Border>
             </TitledBorder>
           </Border>
@@ -136,7 +136,7 @@
                   <Component id="jCheckBox3" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jButton1" min="-2" pref="33" max="-2" attributes="0"/>
-                  <EmptySpace pref="33" max="32767" attributes="0"/>
+                  <EmptySpace pref="27" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

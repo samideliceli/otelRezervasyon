@@ -39,8 +39,8 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Otel Bilgileri">
-              <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
-                <LineBorder/>
+              <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder/>
               </Border>
             </TitledBorder>
           </Border>
@@ -63,17 +63,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jButton1" min="-2" pref="148" max="-2" attributes="0"/>
                       <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="jTextField4" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jTextField3" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jTextField1" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jTextField2" alignment="0" min="-2" pref="96" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="130" max="-2" attributes="0"/>
+                      <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                          <Component id="jTextField4" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jTextField3" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jTextField1" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jTextField2" alignment="0" min="-2" pref="96" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="25" max="32767" attributes="0"/>
+                  <EmptySpace pref="54" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

@@ -22,6 +22,7 @@ public class programArayuz extends javax.swing.JFrame {
         muhasebe muhasebe=new muhasebe();
         hizmetler hizmet= new hizmetler();
         personelİslemleri personel=new personelİslemleri();
+        demirbaslar demirbas=new demirbaslar();
        
     /**
      * Creates new form programArayuz
@@ -44,6 +45,7 @@ public class programArayuz extends javax.swing.JFrame {
         tabbedPane.add("Muhasebe", muhasebe); 
         tabbedPane.add("Personel",personel);
         tabbedPane.add("Hizmetler",hizmet);
+        tabbedPane.add("Demirbaş",demirbas);
         
         
     }
@@ -156,6 +158,7 @@ public class programArayuz extends javax.swing.JFrame {
     frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     frame.getContentPane().add (new fırsatlar());
     frame.pack();
+    frame.setResizable(false);
     frame.setLocationRelativeTo(null);
     frame.setVisible (true);
     }//GEN-LAST:event_firsatButonActionPerformed
@@ -167,6 +170,7 @@ public class programArayuz extends javax.swing.JFrame {
     frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     frame.getContentPane().add (new otelBilgileri());
     frame.pack();
+    frame.setResizable(false);
     frame.setLocationRelativeTo(null);
     frame.setVisible (true);
     }//GEN-LAST:event_personelButonActionPerformed
@@ -178,6 +182,7 @@ public class programArayuz extends javax.swing.JFrame {
     frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     frame.getContentPane().add (new özelBildirim());
     frame.pack();
+    frame.setResizable(false);
     frame.setLocationRelativeTo(null);
     frame.setVisible (true);
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -193,7 +198,7 @@ public class programArayuz extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Windows".equals(info.getName())) {
+                if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
