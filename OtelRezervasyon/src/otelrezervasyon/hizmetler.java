@@ -79,7 +79,7 @@ public class hizmetler extends javax.swing.JPanel {
             }
             con.close();
         } catch (SQLException hata) {
-            Logger.getLogger(OtelRezervasyon.class
+            Logger.getLogger(personelİslemleri.class
                     .getName()).log(Level.SEVERE, null, hata);
         }
     }

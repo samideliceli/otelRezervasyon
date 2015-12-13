@@ -235,6 +235,7 @@ public class musteriIslemleri extends javax.swing.JPanel {
     musteriEkle frame = new musteriEkle();
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     frame.pack();
+    frame.setLocationRelativeTo(null);
     frame.setVisible(true);
         
     }//GEN-LAST:event_jButton1ActionPerformed

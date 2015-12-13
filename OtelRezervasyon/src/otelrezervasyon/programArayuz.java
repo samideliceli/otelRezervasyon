@@ -5,8 +5,10 @@
  */
 package otelrezervasyon;
 
+import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -25,6 +27,7 @@ public class programArayuz extends javax.swing.JFrame {
      * Creates new form programArayuz
      */
     public programArayuz() {
+      
         initComponents();
         
         personelButon.setIcon(new javax.swing.ImageIcon("src/images/otel.png"));
@@ -66,7 +69,7 @@ public class programArayuz extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("GRAYLIGHT");
-        setBackground(new java.awt.Color(0, 127, 255));
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setForeground(java.awt.Color.orange);
         setIconImages(null);
 
@@ -153,6 +156,7 @@ public class programArayuz extends javax.swing.JFrame {
     frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     frame.getContentPane().add (new fırsatlar());
     frame.pack();
+    frame.setLocationRelativeTo(null);
     frame.setVisible (true);
     }//GEN-LAST:event_firsatButonActionPerformed
 
@@ -163,6 +167,7 @@ public class programArayuz extends javax.swing.JFrame {
     frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     frame.getContentPane().add (new otelBilgileri());
     frame.pack();
+    frame.setLocationRelativeTo(null);
     frame.setVisible (true);
     }//GEN-LAST:event_personelButonActionPerformed
 
@@ -173,6 +178,7 @@ public class programArayuz extends javax.swing.JFrame {
     frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     frame.getContentPane().add (new özelBildirim());
     frame.pack();
+    frame.setLocationRelativeTo(null);
     frame.setVisible (true);
     }//GEN-LAST:event_jButton2ActionPerformed
 

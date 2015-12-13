@@ -63,6 +63,7 @@ public class musteriEkle extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Müşteri Ekle");
+        setResizable(false);
 
         jLabel2.setText("TC");
 
@@ -323,7 +324,9 @@ public class musteriEkle extends javax.swing.JFrame {
     JFrame frame = new JFrame ("Ek Kişileri Ekle");
     frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     frame.getContentPane().add (new ekKisiEkle());
+    frame.setResizable(false);
     frame.pack();
+    frame.setLocationRelativeTo(null);
     frame.setVisible (true);
     
     }//GEN-LAST:event_jButton1ActionPerformed
