@@ -1,15 +1,13 @@
 package otelrezervasyon;
 
+import java.awt.event.KeyAdapter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -24,13 +22,28 @@ public class hizmetler extends javax.swing.JPanel {
     private DefaultTableModel tb;
     private Object sonDeger;
     private Object[] row;
-    private Object[][] deger;
+    private TableModelListener tml;
     private String sutunAdi;
-    private boolean yenilendi;
+    private KeyAdapter adapter;
+    private Vector veri;
 
     public hizmetler() {
         initComponents();
         db = new dbConnection();
+        servisEkle.setEnabled(false);
+        adapter = new KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                super.keyReleased(evt);
+                if (yeniServiAdi.getText().equals("") || yeniServisUcret.getText().equals("")) {
+                    servisEkle.setEnabled(false);
+                } else {
+                    servisEkle.setEnabled(true);
+                }
+            }
+        };
+        yeniServiAdi.addKeyListener(adapter);
+        yeniServisUcret.addKeyListener(adapter);
         tb = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -42,35 +55,33 @@ public class hizmetler extends javax.swing.JPanel {
         };
         guncelle.setEnabled(false);
         tabloyuCek();
-        deger = new Object[satirSayisi][sutunSayisi];
         for (satir = 0; satir < satirSayisi; satir++) {
             for (sutun = 0; sutun < sutunSayisi; sutun++) {
-                deger[satir][sutun] = tb.getValueAt(satir, sutun);
+                ((Object[]) veri.elementAt(satir))[sutun] = tb.getValueAt(satir, sutun);
             }
         }
-        tb.addTableModelListener(new TableModelListener() {
+        tb.addTableModelListener(tml = new TableModelListener() {
 
+            @Override
             public void tableChanged(TableModelEvent e) {
-                if(!yenilendi){
-                    yenilendi=!yenilendi;
+
                 satir = e.getFirstRow();
                 sutun = e.getColumn();
                 TableModel model = (TableModel) e.getSource();
                 sonDeger = model.getValueAt(satir, sutun);
                 sutunAdi = model.getColumnName(sutun);
-                if (sonDeger.equals(deger[satir][sutun])) {
+                if (sonDeger.equals(((Object[]) veri.elementAt(satir))[sutun])) {
                     guncelle.setEnabled(false);
                 } else {
                     guncelle.setEnabled(true);
                 }
-            }}
+            }
         });
     }
 
     public void tabloyuCek() {
+        veri = new Vector();
         db.dbBaglan();
-        yenilendi=true;
-        tb.getDataVector().removeAllElements();
         try (ResultSet rs = st.executeQuery("SELECT * FROM SERVIS")) {
             sutunSayisi = rs.getMetaData().getColumnCount();
             for (int s = 1; s <= sutunSayisi; s++) {
@@ -81,12 +92,14 @@ public class hizmetler extends javax.swing.JPanel {
                 for (i = 1; i <= sutunSayisi; i++) {
                     row[i - 1] = rs.getObject(i);
                 }
+                veri.addElement(row);
                 tb.addRow(row);
                 servisTablosu.setModel(tb);
                 satirSayisi = tb.getRowCount();
             }
             con.close();
         } catch (SQLException hata) {
+            veri = new Vector();
             Logger.getLogger(personelİslemleri.class
                     .getName()).log(Level.SEVERE, null, hata);
         }
@@ -141,7 +154,7 @@ public class hizmetler extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -150,7 +163,8 @@ public class hizmetler extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(guncelle)
-                    .addComponent(jButton1)))
+                    .addComponent(jButton1))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Servis Ekle"));
@@ -177,29 +191,27 @@ public class hizmetler extends javax.swing.JPanel {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(yeniServiAdi, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-                            .addComponent(yeniServisUcret)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(servisEkle, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 85, Short.MAX_VALUE)))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(yeniServiAdi, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                    .addComponent(yeniServisUcret))
                 .addContainerGap())
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jLabel1)
-                    .addContainerGap(133, Short.MAX_VALUE)))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(46, 46, 46)
+                .addComponent(servisEkle, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(51, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(yeniServiAdi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(yeniServiAdi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addGap(15, 15, 15)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -207,11 +219,6 @@ public class hizmetler extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(servisEkle)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jLabel1)
-                    .addContainerGap(225, Short.MAX_VALUE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -220,19 +227,19 @@ public class hizmetler extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -242,11 +249,11 @@ public class hizmetler extends javax.swing.JPanel {
             String sql = ("UPDATE SERVIS SET " + sutunAdi + " = (?) WHERE " + sutunAdi + " = (?) ");
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setObject(1, sonDeger);
-            ps.setObject(2, deger[satir][sutun]);
+            ps.setObject(2, ((Object[]) veri.elementAt(satir))[sutun]);
             if (ps.executeUpdate() != 0) {
                 JOptionPane.showMessageDialog(null, "Veri Başarıyla Güncellendi!");
-                deger[satir][sutun] = sonDeger;
-                
+                ((Object[]) veri.elementAt(satir))[sutun] = (String) sonDeger;
+
             } else {
                 JOptionPane.showMessageDialog(null, "Hata Oluştu!");
             }
@@ -262,20 +269,22 @@ public class hizmetler extends javax.swing.JPanel {
         String servisUcreti = yeniServisUcret.getText();
         db.dbBaglan();
         try {
-            String sql = ("INSERT INTO SERVIS (ISIM,UCRET,SERVIS_ID) VALUES (?,?,?)");
+            String sql = ("INSERT INTO SERVIS (ISIM,UCRET) VALUES (?,?)");
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, servisAdi);
             ps.setString(2, servisUcreti);
-            ps.setInt(3, 2*Integer.valueOf(servisUcreti));
             ps.executeUpdate();
-            yeniServiAdi.setText("");
-            yeniServisUcret.setText("");
-            tabloyuCek();
-          
             con.close();
         } catch (SQLException ex) {
             Logger.getLogger(hizmetler.class.getName()).log(Level.SEVERE, null, ex);
         }
+        yeniServiAdi.setText("");
+        yeniServisUcret.setText("");
+        tb.removeTableModelListener(tml);
+        tb.setRowCount(0);
+        tb.setColumnCount(0);
+        tabloyuCek();
+        tb.addTableModelListener(tml);
     }//GEN-LAST:event_servisEkleActionPerformed
 
     private void yeniServisUcretActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yeniServisUcretActionPerformed

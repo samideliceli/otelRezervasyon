@@ -10,27 +10,26 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-
 /**
  *
  * @author delilog
  */
 public class programArayuz extends javax.swing.JFrame {
-  
-        musteriIslemleri musteri = new musteriIslemleri();
-        odaIslemleri oda = new odaIslemleri();
-        muhasebe muhasebe=new muhasebe();
-        hizmetler hizmet= new hizmetler();
-        personelİslemleri personel=new personelİslemleri();
-        demirbaslar demirbas=new demirbaslar();
-       
+
+    musteriIslemleri musteri = new musteriIslemleri();
+    odaIslemleri oda = new odaIslemleri();
+    muhasebe muhasebe = new muhasebe();
+    hizmetler hizmet = new hizmetler();
+    personelİslemleri personel = new personelİslemleri();
+    demirbaslar demirbas = new demirbaslar();
+
     /**
      * Creates new form programArayuz
      */
     public programArayuz() {
-      
+
         initComponents();
-        
+
         personelButon.setIcon(new javax.swing.ImageIcon("src/images/otel.png"));
         firsatButon.setIcon(new javax.swing.ImageIcon("src/images/advantage.png"));
         jButton2.setIcon(new javax.swing.ImageIcon("src/images/notification.png"));
@@ -38,16 +37,14 @@ public class programArayuz extends javax.swing.JFrame {
         jLabel2.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
         jLabel3.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
         jLabel4.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
-        
-        
+
         tabbedPane.add("Müşteri", musteri);
         tabbedPane.add("Oda", oda);
-        tabbedPane.add("Muhasebe", muhasebe); 
-        tabbedPane.add("Personel",personel);
-        tabbedPane.add("Hizmetler",hizmet);
-        tabbedPane.add("Demirbaş",demirbas);
-        
-        
+        tabbedPane.add("Muhasebe", muhasebe);
+        tabbedPane.add("Personel", personel);
+        tabbedPane.add("Hizmetler", hizmet);
+        tabbedPane.add("Demirbaş", demirbas);
+
     }
 
     /**
@@ -153,38 +150,38 @@ public class programArayuz extends javax.swing.JFrame {
 
     private void firsatButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firsatButonActionPerformed
         // TODO add your handling code here:
-        
-    JFrame frame = new JFrame ("Fırsatları Bildir");
-    frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
-    frame.getContentPane().add (new fırsatlar());
-    frame.pack();
-    frame.setResizable(false);
-    frame.setLocationRelativeTo(null);
-    frame.setVisible (true);
+
+        JFrame frame = new JFrame("Fırsatları Bildir");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.getContentPane().add(new fırsatlar());
+        frame.pack();
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }//GEN-LAST:event_firsatButonActionPerformed
 
     private void personelButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_personelButonActionPerformed
         // TODO add your handling code here:
-        
-    JFrame frame = new JFrame ("Otel Bilgileri");
-    frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
-    frame.getContentPane().add (new otelBilgileri());
-    frame.pack();
-    frame.setResizable(false);
-    frame.setLocationRelativeTo(null);
-    frame.setVisible (true);
+
+        JFrame frame = new JFrame("Otel Bilgileri");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.getContentPane().add(new otelBilgileri());
+        frame.pack();
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }//GEN-LAST:event_personelButonActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        
-    JFrame frame = new JFrame ("Sorun Bildirme");
-    frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
-    frame.getContentPane().add (new özelBildirim());
-    frame.pack();
-    frame.setResizable(false);
-    frame.setLocationRelativeTo(null);
-    frame.setVisible (true);
+
+        JFrame frame = new JFrame("Sorun Bildirme");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.getContentPane().add(new özelBildirim());
+        frame.pack();
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -198,7 +195,7 @@ public class programArayuz extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
