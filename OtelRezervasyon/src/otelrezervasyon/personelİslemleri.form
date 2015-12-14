@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.9" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
     <Property name="toolTipText" type="java.lang.String" value=""/>
   </Properties>
@@ -23,21 +23,21 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel1" max="32767" attributes="0"/>
                   <Component id="jPanel2" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel3" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
@@ -46,7 +46,7 @@
                   </Group>
                   <Component id="jPanel3" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -59,35 +59,12 @@
             <LineBorder/>
           </Border>
         </Property>
+        <Property name="autoscrolls" type="boolean" value="true"/>
       </Properties>
 
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="jTextField1" min="-2" pref="136" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="jButton1" min="-2" pref="87" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="100" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+        <Property name="columns" type="int" value="0"/>
+        <Property name="rows" type="int" value="1"/>
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
@@ -96,9 +73,13 @@
               <Color blue="f0" green="f1" red="c8" type="rgb"/>
             </Property>
             <Property name="text" type="java.lang.String" value="&#x130;sim:"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField1">
+          <Properties>
+            <Property name="horizontalAlignment" type="int" value="0"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButton1">
           <Properties>
@@ -119,7 +100,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jScrollPane1" min="-2" pref="479" max="-2" attributes="0"/>
+              <Component id="jScrollPane1" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -284,17 +265,33 @@
         <Component class="javax.swing.JTextField" name="jTextField2">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
+            <Property name="autoscrolls" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField3">
+          <Properties>
+            <Property name="autoscrolls" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField4">
+          <Properties>
+            <Property name="autoscrolls" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField5">
+          <Properties>
+            <Property name="autoscrolls" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField6">
+          <Properties>
+            <Property name="autoscrolls" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField7">
+          <Properties>
+            <Property name="autoscrolls" type="boolean" value="false"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
