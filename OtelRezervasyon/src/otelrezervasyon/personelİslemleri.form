@@ -28,15 +28,15 @@
                   <Component id="jPanel1" max="32767" attributes="0"/>
                   <Component id="jPanel2" max="32767" attributes="0"/>
               </Group>
-<<<<<<< HEAD
+
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-=======
+
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace pref="76" max="32767" attributes="0"/>
->>>>>>> 3606ee3926ac4550033e420d3153f8400db78653
+
           </Group>
       </Group>
     </DimensionLayout>
@@ -68,11 +68,11 @@
         <Property name="autoscrolls" type="boolean" value="true"/>
       </Properties>
 
-<<<<<<< HEAD
+
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
         <Property name="columns" type="int" value="0"/>
         <Property name="rows" type="int" value="1"/>
-=======
+
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
@@ -100,7 +100,7 @@
               </Group>
           </Group>
         </DimensionLayout>
->>>>>>> 3606ee3926ac4550033e420d3153f8400db78653
+
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
@@ -136,14 +136,14 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-<<<<<<< HEAD
+
               <Component id="jScrollPane1" max="32767" attributes="0"/>
-=======
+
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jScrollPane1" min="-2" pref="652" max="-2" attributes="0"/>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
->>>>>>> 3606ee3926ac4550033e420d3153f8400db78653
+
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -322,15 +322,15 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField5">
-<<<<<<< HEAD
+
           <Properties>
             <Property name="autoscrolls" type="boolean" value="false"/>
           </Properties>
-=======
+
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextField5ActionPerformed"/>
           </Events>
->>>>>>> 3606ee3926ac4550033e420d3153f8400db78653
+
         </Component>
         <Component class="javax.swing.JTextField" name="jTextField6">
           <Properties>
