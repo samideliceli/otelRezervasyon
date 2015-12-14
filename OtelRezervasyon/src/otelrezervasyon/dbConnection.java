@@ -20,7 +20,7 @@ public class dbConnection {
             con = DriverManager.getConnection(host, userName, userPass);
             st = (Statement) con.createStatement();
         } catch (SQLException ex) {
-            Logger.getLogger(OtelRezervasyon.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
