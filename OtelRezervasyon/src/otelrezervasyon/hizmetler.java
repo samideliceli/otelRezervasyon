@@ -23,13 +23,17 @@ public class hizmetler extends javax.swing.JPanel {
     private Object sonDeger;
     private Object[] row;
     private TableModelListener tml;
-    private String sutunAdi;
+    private String sutunAdi, sql;
     private KeyAdapter adapter;
     private Vector veri;
+    private tableModel t;
+    private ResultSet rs;
 
     public hizmetler() {
         initComponents();
         db = new dbConnection();
+        t = new tableModel();
+        sql = "SELECT * FROM SERVIS";
         servisEkle.setEnabled(false);
         adapter = new KeyAdapter() {
             @Override
@@ -54,55 +58,30 @@ public class hizmetler extends javax.swing.JPanel {
             }
         };
         guncelle.setEnabled(false);
-        tabloyuCek();
         for (satir = 0; satir < satirSayisi; satir++) {
             for (sutun = 0; sutun < sutunSayisi; sutun++) {
                 ((Object[]) veri.elementAt(satir))[sutun] = tb.getValueAt(satir, sutun);
             }
         }
-        tb.addTableModelListener(tml = new TableModelListener() {
+        /*tb.addTableModelListener(tml = new TableModelListener() {
 
-            @Override
-            public void tableChanged(TableModelEvent e) {
+         @Override
+         public void tableChanged(TableModelEvent e) {
 
-                satir = e.getFirstRow();
-                sutun = e.getColumn();
-                TableModel model = (TableModel) e.getSource();
-                sonDeger = model.getValueAt(satir, sutun);
-                sutunAdi = model.getColumnName(sutun);
-                if (sonDeger.equals(((Object[]) veri.elementAt(satir))[sutun])) {
-                    guncelle.setEnabled(false);
-                } else {
-                    guncelle.setEnabled(true);
-                }
-            }
-        });
-    }
-
-    public void tabloyuCek() {
-        veri = new Vector();
-        db.dbBaglan();
-        try (ResultSet rs = st.executeQuery("SELECT * FROM SERVIS")) {
-            sutunSayisi = rs.getMetaData().getColumnCount();
-            for (int s = 1; s <= sutunSayisi; s++) {
-                tb.addColumn(rs.getMetaData().getColumnName(s));
-            }
-            while (rs.next()) {
-                row = new Object[sutunSayisi];
-                for (i = 1; i <= sutunSayisi; i++) {
-                    row[i - 1] = rs.getObject(i);
-                }
-                veri.addElement(row);
-                tb.addRow(row);
-                servisTablosu.setModel(tb);
-                satirSayisi = tb.getRowCount();
-            }
-            con.close();
-        } catch (SQLException hata) {
-            veri = new Vector();
-            Logger.getLogger(personelİslemleri.class
-                    .getName()).log(Level.SEVERE, null, hata);
-        }
+         satir = e.getFirstRow();
+         sutun = e.getColumn();
+         TableModel model = (TableModel) e.getSource();
+         sonDeger = model.getValueAt(satir, sutun);
+         sutunAdi = model.getColumnName(sutun);
+         if (sonDeger.equals(((Object[]) veri.elementAt(satir))[sutun])) {
+         guncelle.setEnabled(false);
+         } else {
+         guncelle.setEnabled(true);
+         }
+         }
+         }); */
+        t.tabloyuOlustur(sql, veri, tb);
+        servisTablosu.setModel(tb);
     }
 
     @SuppressWarnings("unchecked")
@@ -280,11 +259,9 @@ public class hizmetler extends javax.swing.JPanel {
         }
         yeniServiAdi.setText("");
         yeniServisUcret.setText("");
-        tb.removeTableModelListener(tml);
         tb.setRowCount(0);
         tb.setColumnCount(0);
-        tabloyuCek();
-        tb.addTableModelListener(tml);
+        t.tabloyuOlustur(sql, veri, tb);
     }//GEN-LAST:event_servisEkleActionPerformed
 
     private void yeniServisUcretActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yeniServisUcretActionPerformed

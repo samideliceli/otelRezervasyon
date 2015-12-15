@@ -1,9 +1,77 @@
 package otelrezervasyon;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+import static otelrezervasyon.dbConnection.con;
+import static otelrezervasyon.dbConnection.st;
+
 public class muhasebe extends javax.swing.JPanel {
+
+    private dbConnection db;
+    private DefaultTableModel tbGelir, tbGider;
+    private tableModel t;
+    private Object[] row;
+    private int gesutunSayisi, gesatirSayisi, i, gisutunSayisi, gisatirSayisi;
+    private Vector gelir, gider;
 
     public muhasebe() {
         initComponents();
+        db = new dbConnection();
+        t = new tableModel();
+        String sql = "SELECT * FROM GELIR";
+        String sql2 = "SELECT * FROM GIDER";
+        tbGelir = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                if (col == 0 || col == 1) {
+                    return false;
+                }
+                return true;
+            }
+        };
+        tbGider = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                if (col == 0 || col == 1) {
+                    return false;
+                }
+                return true;
+            }
+        };
+        try {
+            db.dbBaglan();
+            String gelirTipleri = ("SELECT * FROM GELIR_TIP");
+            PreparedStatement ps = con.prepareStatement(gelirTipleri, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+            String giderTipleri = ("SELECT * FROM GIDER_TIP");
+            PreparedStatement ps2 = con.prepareStatement(giderTipleri, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+            ps.executeQuery();
+            ps2.executeQuery();
+            ps.getResultSet().last();
+            int gelirTipSayisi = ps.getResultSet().getRow();
+            ps.getResultSet().beforeFirst();
+            ps2.getResultSet().last();
+            int giderTipSayisi = ps2.getResultSet().getRow();
+            ps2.getResultSet().beforeFirst();
+            while (ps.getResultSet().next()) {
+                gelirTur.addItem(ps.getResultSet().getString("TUR"));
+            }
+            while (ps2.getResultSet().next()) {
+                giderTur.addItem(ps2.getResultSet().getString("TUR"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        t.tabloyuOlustur(sql, gelir, tbGelir);
+        gelirTablosu.setModel(tbGelir);
+        t.tabloyuOlustur(sql2, gider, tbGider);
+        giderTablosu.setModel(tbGider);
     }
 
     @SuppressWarnings("unchecked")
@@ -78,7 +146,7 @@ public class muhasebe extends javax.swing.JPanel {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -110,11 +178,9 @@ public class muhasebe extends javax.swing.JPanel {
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Gelir Ekle"));
 
-        jLabel1.setText("Tür : ");
+        jLabel1.setText("Tutar :");
 
-        jLabel2.setText("Tutar :");
-
-        gelirTur.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jLabel2.setText("Tür :");
 
         jButton1.setText("Ekle");
 
@@ -130,13 +196,13 @@ public class muhasebe extends javax.swing.JPanel {
                             .addComponent(jLabel1)
                             .addComponent(jLabel2))
                         .addGap(60, 60, 60)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(gelirTur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(gelirTutar, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(gelirTutar, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
+                            .addComponent(gelirTur, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(146, 146, 146)
                         .addComponent(jButton1)))
-                .addContainerGap(104, Short.MAX_VALUE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -160,8 +226,6 @@ public class muhasebe extends javax.swing.JPanel {
 
         jLabel4.setText("Tutar :");
 
-        giderTur.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jButton2.setText("Ekle");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
@@ -182,7 +246,7 @@ public class muhasebe extends javax.swing.JPanel {
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addGap(146, 146, 146)
                         .addComponent(jButton2)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(130, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
