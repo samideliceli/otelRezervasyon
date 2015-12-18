@@ -3,12 +3,12 @@ package otelrezervasyon;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import static otelrezervasyon.dbConnection.con;
-import static otelrezervasyon.dbConnection.st;
 
 public class muhasebe extends javax.swing.JPanel {
 
@@ -18,13 +18,14 @@ public class muhasebe extends javax.swing.JPanel {
     private Object[] row;
     private int gesutunSayisi, gesatirSayisi, i, gisutunSayisi, gisatirSayisi;
     private Vector gelir, gider;
+    private String sql, sql2;
 
     public muhasebe() {
         initComponents();
         db = new dbConnection();
         t = new tableModel();
-        String sql = "SELECT * FROM GELIR";
-        String sql2 = "SELECT * FROM GIDER";
+        sql = "SELECT * FROM GELIR";
+        sql2 = "SELECT * FROM GIDER";
         tbGelir = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -60,10 +61,10 @@ public class muhasebe extends javax.swing.JPanel {
             int giderTipSayisi = ps2.getResultSet().getRow();
             ps2.getResultSet().beforeFirst();
             while (ps.getResultSet().next()) {
-                gelirTur.addItem(ps.getResultSet().getString("TUR"));
+                gelirTur.addItem(ps.getResultSet().getString("GELIR_TURU"));
             }
             while (ps2.getResultSet().next()) {
-                giderTur.addItem(ps2.getResultSet().getString("TUR"));
+                giderTur.addItem(ps2.getResultSet().getString("GIDER_TURU"));
             }
         } catch (SQLException ex) {
             Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
@@ -146,7 +147,7 @@ public class muhasebe extends javax.swing.JPanel {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -183,6 +184,11 @@ public class muhasebe extends javax.swing.JPanel {
         jLabel2.setText("Tür :");
 
         jButton1.setText("Ekle");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -197,12 +203,12 @@ public class muhasebe extends javax.swing.JPanel {
                             .addComponent(jLabel2))
                         .addGap(60, 60, 60)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(gelirTutar, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
-                            .addComponent(gelirTur, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(gelirTur, 0, 75, Short.MAX_VALUE)
+                            .addComponent(gelirTutar)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(146, 146, 146)
                         .addComponent(jButton1)))
-                .addContainerGap(97, Short.MAX_VALUE))
+                .addContainerGap(86, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -227,6 +233,11 @@ public class muhasebe extends javax.swing.JPanel {
         jLabel4.setText("Tutar :");
 
         jButton2.setText("Ekle");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -241,12 +252,12 @@ public class muhasebe extends javax.swing.JPanel {
                             .addComponent(jLabel4))
                         .addGap(60, 60, 60)
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(giderTutar)
-                            .addComponent(giderTur, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(giderTur, 0, 75, Short.MAX_VALUE)
+                            .addComponent(giderTutar)))
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addGap(146, 146, 146)
                         .addComponent(jButton2)))
-                .addContainerGap(130, Short.MAX_VALUE))
+                .addContainerGap(86, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,9 +314,47 @@ public class muhasebe extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        Object tur = gelirTur.getSelectedItem();
+        Object tutar = gelirTutar.getText();
+        db.dbBaglan();
+        String sql3 = ("INSERT INTO GELIR (GELIR_TURU,TARIH,GELIR) VALUES (?,?,?)");
+        try {
+            PreparedStatement ps = con.prepareStatement(sql3);
+            ps.setObject(1, tur);
+            ps.setObject(2, Calendar.getInstance());
+            ps.setObject(3, tutar);
+            ps.executeUpdate();
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        gelirTutar.setText("");
+        t.tabloyuOlustur(sql, gelir, tbGelir);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        Object tur = giderTur.getSelectedItem();
+        Object tutar = giderTutar.getText();
+        db.dbBaglan();
+        String sql3 = ("INSERT INTO GIDER (GIDER_TURU,TARIH,GIDER) VALUES (?,?,?)");
+        try {
+            PreparedStatement ps = con.prepareStatement(sql3);
+            ps.setObject(1, tur);
+            ps.setObject(2, Calendar.getInstance());
+            ps.setObject(3, tutar);
+            ps.executeUpdate();
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        gelirTutar.setText("");
+        t.tabloyuOlustur(sql2, gider, tbGider);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

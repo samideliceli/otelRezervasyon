@@ -248,7 +248,7 @@ public class hizmetler extends javax.swing.JPanel {
         String servisUcreti = yeniServisUcret.getText();
         db.dbBaglan();
         try {
-            String sql = ("INSERT INTO SERVIS (ISIM,UCRET) VALUES (?,?)");
+            String sql = ("INSERT INTO SERVIS (SERVIS,UCRET) VALUES (?,?)");
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, servisAdi);
             ps.setString(2, servisUcreti);
@@ -259,8 +259,6 @@ public class hizmetler extends javax.swing.JPanel {
         }
         yeniServiAdi.setText("");
         yeniServisUcret.setText("");
-        tb.setRowCount(0);
-        tb.setColumnCount(0);
         t.tabloyuOlustur(sql, veri, tb);
     }//GEN-LAST:event_servisEkleActionPerformed
 
