@@ -20,7 +20,7 @@ public class textKontrolleri {
     
     private final String tcPattern="[0-9]{11}";
     
-    private final String isimSoyisimPattern="[a-zA-Z]+";
+    private final String isimSoyisimPattern="[a-zA-ZöÖŞşİıçÇğĞüÜ ]+";
     
     private final String tarihPattern="^(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[012])-((19|20)\\d\\d)$"; 
     

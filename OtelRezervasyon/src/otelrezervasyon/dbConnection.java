@@ -23,4 +23,15 @@ public class dbConnection {
             Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public static Connection getCon() {
+        return con;
+    }
+
+    public static Statement getSt() {
+        return st;
+    }
+    
+    
+    
 }

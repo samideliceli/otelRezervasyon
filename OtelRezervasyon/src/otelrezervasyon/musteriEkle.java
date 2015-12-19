@@ -5,10 +5,21 @@
  */
 package otelrezervasyon;
 
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.KeyAdapter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.awt.event.WindowEvent;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -16,7 +27,6 @@ import javax.swing.JFrame;
  */
 public class musteriEkle extends javax.swing.JFrame {
 
-    private final dbConnection db;
     private final KeyAdapter adapter;
     
     
@@ -30,18 +40,21 @@ public class musteriEkle extends javax.swing.JFrame {
     private String onOdemeText;
     private String telefonText;
     private final textKontrolleri kontrol;
+    private dbConnection db;
+    private PreparedStatement ps;
+    private ResultSet rs;
+    private Statement st;
     /**
      * Creates new form musteriEkle
      */
     public musteriEkle() {
         kontrol = new textKontrolleri();
         initComponents();
+        db=new dbConnection();
         buttonGroup1.add(jRadioButton1);
         buttonGroup1.add(jRadioButton2);
         
-        db = new dbConnection();
         kaydet.setEnabled(false);
-        yeniKisiButton.setEnabled(false);
         adapter = new KeyAdapter() {
             @Override
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -49,15 +62,12 @@ public class musteriEkle extends javax.swing.JFrame {
                 if (degerlerDoluMu()) {
                         if (degerKontrolleri()){
                                 kaydet.setEnabled(true); 
-                                yeniKisiButton.setEnabled(true);
                         }
                         else {
                             kaydet.setEnabled(false);
-                            yeniKisiButton.setEnabled(false);
                         }
                 } else{ 
                     kaydet.setEnabled(false);
-                    yeniKisiButton.setEnabled(false);
                 }
             }  
         };
@@ -72,7 +82,7 @@ public class musteriEkle extends javax.swing.JFrame {
         onOdeme.addKeyListener(adapter);
         
         
-    }
+        }
       private boolean degerKontrolleri() {
           tcText=tc.getText();
           emailText=email.getText();
@@ -82,7 +92,6 @@ public class musteriEkle extends javax.swing.JFrame {
           ikinciTarihText=bitisTarih.getText();
           onOdemeText=onOdeme.getText();
           telefonText=telefon.getText();
-           jLabel13.setText(kontrol.telefonKontrol(telefonText) +"");
            
           return kontrol.onOdemeKontrol(onOdemeText)
                   && kontrol.telefonKontrol(telefonText) && kontrol.tcKontrol(tcText) && kontrol.emailKontrol(emailText) && 
@@ -123,6 +132,149 @@ public class musteriEkle extends javax.swing.JFrame {
                 
                 return true;
                }
+    
+    private int otelBilgileriniKaydet(String tc) {
+        
+        String sql="";
+        db.dbBaglan();
+        st=dbConnection.getSt();
+        try {
+            rs=st.executeQuery("SELECT * FROM musteri WHERE tc='"+tcText+"'");  
+            
+            while(rs.next())
+            {
+                int id = rs.getInt(1);
+                System.out.println(""+id);
+                return id;
+            }
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return -1;
+    }
+
+    
+    private void musteriKaydet() {
+     String sql="Insert INTO musteri (AD,SOYAD,CINSIYET,TC,TELEFON,EMAIL,INDIRIM_MIKTARI) "
+                + "VALUES (?,?,?,?,?,?,?)";
+        db.dbBaglan();
+        String cinsiyet;
+        
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        
+        if(this.cinsiyet.getSelectedIndex()==0){
+            cinsiyet="e";
+        }
+        else{
+            cinsiyet="k";
+        }
+        
+        try {
+            ps =db.getCon().prepareStatement(sql);
+            
+            ps.setString(1, isimText);
+            ps.setString(2, soyIsimText);
+            ps.setString(3, cinsiyet);
+            ps.setString(4, tcText);
+            ps.setString(5, telefonText);
+            ps.setString(6, emailText);
+            ps.setInt(7, 0);
+            ps.executeUpdate();
+            
+            
+            
+            int id = otelBilgileriniKaydet(tcText);
+            Date date = formatter.parse(ilkTarihText);
+            java.sql.Date sqldate;
+            sqldate = new java.sql.Date(date.getTime());
+            String sql2="Insert INTO musteri_otel_bilgileri (MUSTERI_ID,ODA_NO,ON_ODEME_TUTAR,BASLANGIC_TARIHI,BITIS_TARIHI,"
+                    + "ILISKI_KESIM,KONAK_SAYISI) VALUES (?,?,?,?,?,?,?)";
+            
+            ps =db.getCon().prepareStatement(sql2);
+            ps.setInt(1, id);
+            ps.setInt(2, 10);
+            ps.setInt(3, Integer.valueOf(onOdemeText));
+            ps.setDate(4,  sqldate);
+            ps.setDate(5, sqldate);
+            ps.setBoolean(6, false);
+            ps.setInt(7, 5);
+            ps.execute();
+            
+            db.getCon().close();
+            
+            
+            WindowEvent closingEvent = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
+            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(closingEvent);
+
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+    }
+
+    private void rezervasyonKaydet() {  
+    
+        
+        String sql="Insert INTO rezervasyon (AD,SOYAD,CINSIYET,TC,TELEFON,"
+                + "EMAIL,BASLANGIC_TARIHI,BITIS_TARIHI,ODEME_TUTARI,ODA_NO) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+        db.dbBaglan();
+        String cinsiyet;
+        
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        
+        if(this.cinsiyet.getSelectedIndex()==0){
+            cinsiyet="e";
+        }
+        else{
+            cinsiyet="k";
+        }
+        
+        try {
+            ps =db.getCon().prepareStatement(sql);
+            
+            
+            Date date = formatter.parse(ilkTarihText);
+            java.sql.Date sqldate;
+            sqldate = new java.sql.Date(date.getTime());
+            
+            Date date2 = formatter.parse(ikinciTarihText);
+            java.sql.Date sqldate2;
+            sqldate2 = new java.sql.Date(date.getTime());
+            
+            
+            ps.setString(1, isimText);
+            ps.setString(2, soyIsimText);
+            ps.setString(3, cinsiyet);
+            ps.setString(4, tcText);
+            ps.setString(5, telefonText);
+            ps.setString(6, emailText);
+            ps.setDate(7, sqldate);
+            ps.setDate(8, sqldate2);
+            ps.setInt(9,Integer.valueOf(onOdemeText));
+            ps.setInt(10, 15);
+            ps.executeUpdate();
+            
+            db.getCon().close();
+            
+            
+            WindowEvent closingEvent = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
+            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(closingEvent);
+
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -156,13 +308,20 @@ public class musteriEkle extends javax.swing.JFrame {
         bitisTarih = new javax.swing.JTextField();
         onOdeme = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
-        yeniKisiButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Müşteri Ekle");
@@ -172,7 +331,7 @@ public class musteriEkle extends javax.swing.JFrame {
 
         jLabel3.setText("İsim");
 
-        jLabel4.setText("Soyisim");
+        jLabel4.setText("Yetişkin");
 
         jLabel5.setText("Telefon");
 
@@ -214,6 +373,8 @@ public class musteriEkle extends javax.swing.JFrame {
             }
         });
 
+        onOdeme.setText("45");
+        onOdeme.setEnabled(false);
         onOdeme.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 onOdemeActionPerformed(evt);
@@ -221,13 +382,6 @@ public class musteriEkle extends javax.swing.JFrame {
         });
 
         jLabel10.setText("Ön ödeme");
-
-        yeniKisiButton.setText("Yeni Kişi Ekle");
-        yeniKisiButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yeniKisiButtonActionPerformed(evt);
-            }
-        });
 
         jPanel1.setBackground(new java.awt.Color(44, 136, 228));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -254,7 +408,7 @@ public class musteriEkle extends javax.swing.JFrame {
                 .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(242, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(256, 256, 256))
         );
@@ -268,71 +422,94 @@ public class musteriEkle extends javax.swing.JFrame {
                     .addComponent(jLabel13))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(193, Short.MAX_VALUE))
+                .addContainerGap(183, Short.MAX_VALUE))
         );
 
         jLabel14.setText("Seçilen Oda: 15");
+
+        jLabel15.setText("Soyisim");
+
+        jLabel16.setText("Çocuk");
+
+        jLabel17.setText("Bebek");
+
+        jLabel18.setText("Ücret:");
+
+        jLabel19.setText("300 ₺");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
                                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(jLabel3)
-                                                    .addComponent(jLabel2)
-                                                    .addComponent(jLabel7))
-                                                .addGap(16, 16, 16))
-                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                                .addComponent(jLabel10)
-                                                .addGap(18, 18, 18)))
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(tc, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(isim, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(onOdeme, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
-                                                .addComponent(baslangicTarih, javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(telefon, javax.swing.GroupLayout.Alignment.LEADING)))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel1))
-                                        .addGap(18, 18, Short.MAX_VALUE)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(soyisim)
-                                            .addComponent(cinsiyet, 0, 199, Short.MAX_VALUE)))
+                                            .addComponent(jLabel3)
+                                            .addComponent(jLabel2)
+                                            .addComponent(jLabel7))
+                                        .addGap(16, 16, 16))
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel6)
-                                            .addComponent(jLabel8))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(bitisTarih, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
-                                            .addComponent(email)))))
+                                        .addComponent(jLabel10)
+                                        .addGap(18, 18, 18)))
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(tc, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                                    .addComponent(onOdeme, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                                    .addComponent(baslangicTarih)
+                                    .addComponent(telefon)
+                                    .addComponent(isim)))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jRadioButton2)
                                 .addGap(18, 18, 18)
-                                .addComponent(jRadioButton1)
-                                .addGap(0, 0, Short.MAX_VALUE))))
+                                .addComponent(jRadioButton1)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, Short.MAX_VALUE)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(soyisim)
+                                    .addComponent(cinsiyet, 0, 199, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel15))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(bitisTarih, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                                        .addComponent(email))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                                .addComponent(jLabel4)
+                                                .addGap(6, 6, 6))
+                                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                                .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                                            .addComponent(jTextField3))
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jLabel16)
+                                        .addGap(6, 6, 6)
+                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel14)
-                        .addGap(307, 307, 307)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(yeniKisiButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(kaydet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel19)
+                        .addGap(93, 93, 93)
+                        .addComponent(kaydet, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -341,49 +518,54 @@ public class musteriEkle extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(isim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(tc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1)
-                            .addComponent(cinsiyet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(isim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(tc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel1)
+                                    .addComponent(cinsiyet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel5)
+                                    .addComponent(telefon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel6)
+                                    .addComponent(email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(baslangicTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel8)
+                                    .addComponent(bitisTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(soyisim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(telefon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6)
-                            .addComponent(email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(baslangicTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8)
-                            .addComponent(bitisTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel4)
-                        .addComponent(soyisim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
+                            .addComponent(onOdeme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel4)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel16)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel15))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(onOdeme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10))
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel17))
                 .addGap(10, 10, 10)
-                .addComponent(yeniKisiButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jRadioButton2)
                     .addComponent(jRadioButton1))
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(31, 31, 31)
-                        .addComponent(jLabel14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(kaydet)
-                        .addGap(25, 25, 25)))
+                .addGap(23, 23, 23)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(kaydet)
+                    .addComponent(jLabel14)
+                    .addComponent(jLabel18)
+                    .addComponent(jLabel19))
+                .addGap(12, 12, 12)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -423,20 +605,22 @@ public class musteriEkle extends javax.swing.JFrame {
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void kaydetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kaydetActionPerformed
-        // TODO add your handling code here:
+       
+           boolean rezervasyonMu=jRadioButton2.isSelected();
+        
+        if(rezervasyonMu){
+        
+        rezervasyonKaydet();
+        }
+        else{
+        musteriKaydet();
+        }
+        
+       
+        
+        
+        
     }//GEN-LAST:event_kaydetActionPerformed
-
-    private void yeniKisiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yeniKisiButtonActionPerformed
-        // TODO add your handling code here:
-    JFrame frame = new JFrame ("Ek Kişileri Ekle");
-    frame.setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
-    frame.getContentPane().add (new ekKisiEkle());
-    frame.setResizable(false);
-    frame.pack();
-    frame.setLocationRelativeTo(null);
-    frame.setVisible (true);
-    
-    }//GEN-LAST:event_yeniKisiButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -486,6 +670,11 @@ public class musteriEkle extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -498,14 +687,25 @@ public class musteriEkle extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
     private javax.swing.JButton kaydet;
     private javax.swing.JTextField onOdeme;
     private javax.swing.JTextField soyisim;
     private javax.swing.JTextField tc;
     private javax.swing.JTextField telefon;
-    private javax.swing.JButton yeniKisiButton;
     // End of variables declaration//GEN-END:variables
 
+  
+
+    
+
+   
+
+   
+
+    
     
 
     
