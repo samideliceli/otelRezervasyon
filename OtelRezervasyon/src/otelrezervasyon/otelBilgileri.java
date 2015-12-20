@@ -5,6 +5,12 @@
  */
 package otelrezervasyon;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static otelrezervasyon.dbConnection.con;
+
 /**
  *
  * @author delilog
@@ -14,8 +20,12 @@ public class otelBilgileri extends javax.swing.JPanel {
     /**
      * Creates new form otelBilgileri
      */
+    
+    private dbConnection db;
+    
     public otelBilgileri() {
         initComponents();
+        db = new dbConnection();
     }
 
     /**
@@ -28,50 +38,54 @@ public class otelBilgileri extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
+        yildizSayisi = new javax.swing.JTextField();
+        otelAdi = new javax.swing.JTextField();
+        telefonNo = new javax.swing.JTextField();
+        faxNo = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
+        otelAdres = new javax.swing.JTextArea();
+        kaydet = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        katSayisi = new javax.swing.JTextField();
+        odaSayisi = new javax.swing.JTextField();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(""), "Otel Bilgileri"));
 
-        jTextField2.setText("5");
+        yildizSayisi.setText("5");
 
-        jTextField1.setText("GrayLight Termal");
-        jTextField1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        otelAdi.setText("GrayLight Termal");
+        otelAdi.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        otelAdi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                otelAdiActionPerformed(evt);
             }
         });
 
-        jTextField3.setText("0212-123-4567");
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+        telefonNo.setText("02121234567");
+        telefonNo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+                telefonNoActionPerformed(evt);
             }
         });
 
-        jTextField4.setText("0212-123-4567");
+        faxNo.setText("02121234567");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
-        jTextArea1.setRows(5);
-        jTextArea1.setText("Bağcılar ");
-        jScrollPane1.setViewportView(jTextArea1);
+        otelAdres.setColumns(20);
+        otelAdres.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        otelAdres.setRows(5);
+        otelAdres.setText("Bağcılar ");
+        jScrollPane1.setViewportView(otelAdres);
 
-        jButton1.setText("Kaydet");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        kaydet.setText("Kaydet");
+        kaydet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                kaydetActionPerformed(evt);
             }
         });
 
@@ -84,6 +98,19 @@ public class otelBilgileri extends javax.swing.JPanel {
         jLabel1.setText("Yıldız Sayısı :");
 
         jLabel2.setText("Otel İsmi :");
+
+        jLabel6.setText("Kat Sayısı :");
+
+        jLabel7.setText("Oda Sayısı :");
+
+        katSayisi.setText("5");
+
+        odaSayisi.setText("100");
+        odaSayisi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                odaSayisiActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -99,40 +126,62 @@ public class otelBilgileri extends javax.swing.JPanel {
                     .addComponent(jLabel5))
                 .addGap(50, 50, 50)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(kaydet, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(54, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(faxNo, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(telefonNo, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(otelAdi, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(yildizSayisi, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jLabel6)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(katSayisi))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jLabel7)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(odaSayisi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 17, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(otelAdi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(yildizSayisi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(telefonNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(katSayisi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(odaSayisi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(faxNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addGap(27, 27, 27)
-                .addComponent(jButton1)
+                .addComponent(kaydet)
                 .addContainerGap())
         );
 
@@ -154,32 +203,72 @@ public class otelBilgileri extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void otelAdiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_otelAdiActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_otelAdiActionPerformed
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+    private void telefonNoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_telefonNoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+    }//GEN-LAST:event_telefonNoActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void kaydetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kaydetActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+        Object ad = otelAdi.getText();
+        Object adres = otelAdres.getText();
+        Object tel = telefonNo.getText();
+        Object fax = faxNo.getText();
+        Object yildiz = yildizSayisi.getText();
+        Object kat = katSayisi.getText();
+        Object oda = odaSayisi.getText();
+        db.dbBaglan();
+        String sql_otel = ("INSERT INTO OTEL_BILGILERI (OTEL_ADI,OTEL_ADRES,OTEL_TELEFON,OTEL_FAX,OTEL_YILDIZ,KAT_SAYISI,ODA_SAYISI) VALUES (?,?,?,?,?,?,?)");
+        try {
+            PreparedStatement ps = con.prepareStatement(sql_otel);
+            ps.setObject(1, ad);
+            ps.setObject(2, adres);
+            ps.setObject(3, tel);
+            ps.setObject(4, fax);
+            ps.setObject(5, yildiz);
+            ps.setObject(6, kat);
+            ps.setObject(7, oda);
+            ps.executeUpdate();
+            con.close();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(otelBilgileri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        otelAdi.setText("");
+        otelAdres.setText("");
+        telefonNo.setText("");
+        faxNo.setText("");
+        yildizSayisi.setText("");
+        katSayisi.setText("");
+        odaSayisi.setText("");
+    }//GEN-LAST:event_kaydetActionPerformed
+
+    private void odaSayisiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_odaSayisiActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_odaSayisiActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JTextField faxNo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JTextField katSayisi;
+    private javax.swing.JButton kaydet;
+    private javax.swing.JTextField odaSayisi;
+    private javax.swing.JTextField otelAdi;
+    private javax.swing.JTextArea otelAdres;
+    private javax.swing.JTextField telefonNo;
+    private javax.swing.JTextField yildizSayisi;
     // End of variables declaration//GEN-END:variables
 }
