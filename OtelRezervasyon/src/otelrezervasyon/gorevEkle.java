@@ -23,9 +23,9 @@ public class gorevEkle extends javax.swing.JPanel {
     dbConnection baglan;
     private String gorev,maas,izinHakki;
     private final KeyAdapter adapter;
-    private final tableModel t;
+    private  tableModel t;
     private String sql;
-    private final DefaultTableModel tb;
+    private  DefaultTableModel tb;
     private Vector veri;
     /**
      * Creates new form gorevEkle
@@ -35,21 +35,7 @@ public class gorevEkle extends javax.swing.JPanel {
         jButtonGorevEkle.setEnabled(false);
         baglan = new dbConnection();
         
-        t = new tableModel();
-        sql = " Select * From GOREV ";
-        
-        tb = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int col) {
-                if (col == 0) {
-                    return false;
-                }
-                return true;
-            }
-        };
-        
-        t.tabloyuOlustur(sql, veri, tb);
-        jTableGorev.setModel(tb);
+        tabloDoldur();
         
         adapter = new KeyAdapter() {
             @Override
@@ -80,6 +66,23 @@ public class gorevEkle extends javax.swing.JPanel {
             return false;
         }
         
+    }
+    private void tabloDoldur(){
+        t = new tableModel();
+        sql = " Select * From GOREV ";
+        
+        tb = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                if (col == 0) {
+                    return false;
+                }
+                return true;
+            }
+        };
+        
+        t.tabloyuOlustur(sql, veri, tb);
+        jTableGorev.setModel(tb);
     }
 
 
@@ -275,6 +278,7 @@ public class gorevEkle extends javax.swing.JPanel {
         } catch (SQLException ex) {
             Logger.getLogger(gorevEkle.class.getName()).log(Level.SEVERE, null, ex);
         }
+         tabloDoldur();
     }//GEN-LAST:event_jButtonGorevEkleActionPerformed
 
 
