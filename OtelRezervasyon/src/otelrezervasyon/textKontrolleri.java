@@ -20,6 +20,8 @@ public class textKontrolleri {
     
     private final String tcPattern="[0-9]{11}";
     
+    private static final String sayiPatern="[0-9]+";
+    
     private final String isimSoyisimPattern="[a-zA-ZöÖŞşİıçÇğĞüÜ ]+";
     
     private final String tarihPattern="^(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[012])-((19|20)\\d\\d)$"; 
@@ -103,5 +105,7 @@ public class textKontrolleri {
       return telefonText.matches(telefonPattern);
         
     }
-    
+    public static boolean sayiKontrol(String sayiText){
+        return sayiText.matches(sayiPatern);
+    }
 }
