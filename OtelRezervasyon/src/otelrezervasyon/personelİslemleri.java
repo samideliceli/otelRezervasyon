@@ -15,9 +15,11 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
 import static otelrezervasyon.dbConnection.con;
 
 /**
@@ -26,14 +28,21 @@ import static otelrezervasyon.dbConnection.con;
  */
 public class personelİslemleri extends javax.swing.JPanel {
 
-    private String tc,isim,soyIsim,sgkNo,gorev,izinHakki,telefon,eposta,cinsiyet;
+    private String tc,isim,soyIsim,sgkNo,gorev,telefon,eposta,cinsiyet,izinHakki;
     private final KeyAdapter adapter;
     dbConnection baglan;
     textKontrolleri txtkontrol;
+    private tableModel t;
+    private String sql;
+    private DefaultTableModel tb;
+    private Vector veri;
     
     public personelİslemleri() {
         initComponents();
         baglan = new dbConnection();
+        
+        tabloyuDoldur();
+        gorevCBEkle();
         txtkontrol = new textKontrolleri();
         adapter = new KeyAdapter() {
             @Override
@@ -48,11 +57,18 @@ public class personelİslemleri extends javax.swing.JPanel {
             }
            
         };
+        
         jTextFieldIsim.addKeyListener(adapter);
         jTextFieldSgkNo.addKeyListener(adapter);
         jTextFieldTc.addKeyListener(adapter);
         jTextFieldSoyAd.addKeyListener(adapter);
         
+        jComboBoxGorev.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              izinHakkıGorevID();
+            }
+        });
 
     }
     private boolean kaydetHazirMi(){
@@ -89,7 +105,63 @@ public class personelİslemleri extends javax.swing.JPanel {
         }
               
     }
+    private void tabloyuDoldur(){
     
+        t = new tableModel();
+        sql = " Select * From PERSONEL ";
+        
+        tb = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                if (col == 0) {
+                    return false;
+                }
+                return true;
+            }
+        };
+        
+        t.tabloyuOlustur(sql, veri, tb);
+        jTablePersonel.setModel(tb);
+    }
+    private void gorevCBEkle(){
+        try {
+            baglan.dbBaglan();
+            String gorevSql = " Select AD From GOREV ";
+            PreparedStatement ps = con.prepareStatement(gorevSql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+            ps.executeQuery();
+            ps.getResultSet().beforeFirst();
+            while (ps.getResultSet().next()) {
+                jComboBoxGorev.addItem(ps.getResultSet().getString("AD"));
+            }
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private void izinHakkıGorevID(){
+        try {
+            baglan.dbBaglan();
+            String gorevSql = " Select AD,IZIN_HAKKI,GOREV_ID From GOREV";
+            PreparedStatement ps = con.prepareStatement(gorevSql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+            ps.executeQuery();
+            ps.getResultSet().beforeFirst();
+            while (ps.getResultSet().next()) {
+                
+                    if(ps.getResultSet().getString("AD").equals(jComboBoxGorev.getItemAt(jComboBoxGorev.getSelectedIndex()))){
+                       
+                        jTextFieldIzinHakki.setText(ps.getResultSet().getString("IZIN_HAKKI"));
+                        izinHakki = ps.getResultSet().getString("GOREV_ID");
+                    }
+                
+                
+            }
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
 
     /**
@@ -108,6 +180,8 @@ public class personelİslemleri extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTablePersonel = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -145,13 +219,13 @@ public class personelİslemleri extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
+                .addGap(40, 40, 40)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(jTextFieldAranacakIsim, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(26, 26, 26)
                 .addComponent(jButtonPersonelAra, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(81, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,7 +263,12 @@ public class personelİslemleri extends javax.swing.JPanel {
                 "TC", "İsim", "Soyisim", "Sgk No", "Görev", "İzin Hakkı"
             }
         ));
+        jTablePersonel.setAutoscrolls(false);
         jScrollPane1.setViewportView(jTablePersonel);
+
+        jButton1.setText("Güncelle");
+
+        jButton2.setText("Sil");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -197,12 +276,24 @@ public class personelİslemleri extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(323, 323, 323)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(39, 39, 39)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(""), "Yeni Personel Kaydı"));
@@ -229,7 +320,6 @@ public class personelİslemleri extends javax.swing.JPanel {
 
         jTextFieldIzinHakki.setEditable(false);
 
-        jComboBoxGorev.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxGorev.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxGorevActionPerformed(evt);
@@ -325,7 +415,7 @@ public class personelİslemleri extends javax.swing.JPanel {
                     .addComponent(jTextFieldIzinHakki, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jButtonPersonelKaydet)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Görev Ekle"));
@@ -343,7 +433,7 @@ public class personelİslemleri extends javax.swing.JPanel {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButtonGörevEkle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButtonGörevEkle, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -360,15 +450,15 @@ public class personelİslemleri extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(22, 22, 22)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -381,8 +471,9 @@ public class personelİslemleri extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(6, 6, 6)))
                 .addContainerGap())
         );
 
@@ -401,29 +492,31 @@ public class personelİslemleri extends javax.swing.JPanel {
         
         baglan.dbBaglan();
          try {
+            
             String sql = "INSERT INTO PERSONEL (AD,SOYAD,TC,SGK_NO,GOREV_ID,ISE_BASLAMA_TARIHI,CINSIYET,DURUM,KALAN_IZIN_HAKKI) VALUES (?,?,?,?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, isim);
             ps.setString(2, soyIsim);
             ps.setString(3, tc);
             ps.setString(4, sgkNo);
-            ps.setInt(5, 1);
+            ps.setInt(5, Integer.parseInt(izinHakki));
             ps.setDate(6,  new java.sql.Date(gun.getTimeInMillis()));
             ps.setString(7, cinsiyet);
             ps.setBoolean(8, true);
-            ps.setInt(9, 4);
+            ps.setInt(9,Integer.parseInt(jTextFieldIzinHakki.getText()));
             ps.executeUpdate();
             con.close();
         } catch (SQLException ex) {
             Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        
+        tabloyuDoldur();
         
     }//GEN-LAST:event_jButtonPersonelKaydetActionPerformed
 
     private void jComboBoxGorevActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxGorevActionPerformed
-        // TODO add your handling code here:
+        izinHakkıGorevID();
+        
     }//GEN-LAST:event_jComboBoxGorevActionPerformed
 
     private void jButtonGörevEkleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGörevEkleActionPerformed
@@ -434,10 +527,23 @@ public class personelİslemleri extends javax.swing.JPanel {
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.setAlwaysOnTop(true);
+        frame.addWindowListener(new java.awt.event.WindowAdapter() { 
+            @Override 
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+        
+                jComboBoxGorev.removeAllItems();
+                gorevCBEkle();
+            } 
+        }); 
+        jComboBoxGorev.removeAllItems();
+        gorevCBEkle();
     }//GEN-LAST:event_jButtonGörevEkleActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonGörevEkle;
     private javax.swing.JButton jButtonPersonelAra;
     private javax.swing.JButton jButtonPersonelKaydet;
