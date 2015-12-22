@@ -158,6 +158,7 @@ public class programArayuz extends javax.swing.JFrame {
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.setAlwaysOnTop(true);
     }//GEN-LAST:event_firsatButonActionPerformed
 
     private void personelButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_personelButonActionPerformed
@@ -170,6 +171,7 @@ public class programArayuz extends javax.swing.JFrame {
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.setAlwaysOnTop(true);
     }//GEN-LAST:event_personelButonActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -182,6 +184,7 @@ public class programArayuz extends javax.swing.JFrame {
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.setAlwaysOnTop(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
