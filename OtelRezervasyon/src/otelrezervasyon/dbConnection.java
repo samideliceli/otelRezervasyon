@@ -9,6 +9,10 @@ import java.util.logging.Logger;
 
 public class dbConnection {
 
+    static void setAutoCommit(boolean b) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private String host = "jdbc:derby://localhost:1527/otelDb";
     private String userName = "graylight";
     private String userPass = "pass";

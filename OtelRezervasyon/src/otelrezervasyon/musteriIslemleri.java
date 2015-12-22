@@ -62,7 +62,7 @@ public class musteriIslemleri extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField7 = new javax.swing.JTextField();
+        odaNo = new javax.swing.JTextField();
         tarihIlk = new javax.swing.JTextField();
         tarihIki = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
@@ -116,32 +116,31 @@ public class musteriIslemleri extends javax.swing.JPanel {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
+                        .addGap(19, 19, 19)
                         .addComponent(tarihIlk, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(59, 59, 59)
+                        .addGap(54, 54, 54)
                         .addComponent(jLabel2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tarihIki, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(37, 37, 37)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addGap(18, 18, 18)))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
+                        .addGap(50, 50, 50)
+                        .addComponent(jLabel3))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(tarihIki, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(jLabel4)
+                        .addGap(75, 75, 75)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(odaNo, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
                         .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(65, 65, 65)
-                        .addComponent(jLabel1)))
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -156,7 +155,7 @@ public class musteriIslemleri extends javax.swing.JPanel {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tarihIlk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tarihIki, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(odaNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2))
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -259,16 +258,18 @@ public class musteriIslemleri extends javax.swing.JPanel {
     musteriEkle frame = new musteriEkle();
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     frame.pack();
+    frame.setAlwaysOnTop(true);
     frame.setLocationRelativeTo(null);
     frame.addWindowListener(new java.awt.event.WindowAdapter() { 
-    @Override 
-    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-        
-        t.tabloyuOlustur(sql, veri, tb);
-        musteriTablo.setModel(tb);
-        
-    } 
-}); 
+        @Override 
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+
+            t.tabloyuOlustur(sql, veri, tb);
+            musteriTablo.setModel(tb);
+
+        }
+    
+    }); 
     frame.setVisible(true);
         
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -282,21 +283,22 @@ public class musteriIslemleri extends javax.swing.JPanel {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");  
-       
+      boolean tarihVar = false;
       int seciliIndex=jComboBox1.getSelectedIndex();
       if(seciliIndex==0){
-             sql = " Select ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
-                + "konak_sayisi from musteri,musteri_otel_bilgileri Where musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
+             sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
+                + "konak_sayisi FROM musteri,musteri_otel_bilgileri WHERE musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
         
       }
         
       else{
-           sql = " Select ad,soyad,cinsiyet,tc,telefon,email,oda_no,odeme_tutari,baslangic_tarihi,bitis_tarihi"
-                   + " from rezervasyon";
+           sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,odeme_tutari,baslangic_tarihi,bitis_tarihi"
+                   + " FROM rezervasyon";
         
       }
        
       if(!tarihIki.getText().equals("") && !tarihIlk.getText().equals("")){
+          tarihVar=true;
           java.sql.Date sqldate2=null,sqldate=null;
            try {
                Date date;
@@ -312,14 +314,36 @@ public class musteriIslemleri extends javax.swing.JPanel {
             
            
           if(seciliIndex==0){
-          sql=sql+" AND (baslangic_tarihi between '"+sqldate+"' AND '"+sqldate2+"')";
+          sql=sql+" AND (baslangic_tarihi>='"+sqldate+"' AND bitis_tarihi<='"+sqldate2+"')";
           }
           else{
-          sql=sql+" where baslangic_tarihi between '"+sqldate+"' AND '"+sqldate2+"'";
+          sql=sql+" WHERE baslangic_tarihi>='"+sqldate+"' AND bitis_tarihi<='"+sqldate2+"'";
  
           }
                
-      }System.out.println(sql);
+      }
+      
+      String odaNosu=odaNo.getText();
+      
+      if(!odaNosu.equals("")){
+         
+         if(seciliIndex==0){
+          sql=sql+" AND (musteri_otel_bilgileri.oda_no="+odaNosu+")";
+          }
+         else{
+                if(tarihVar){
+                    
+                   sql=sql+" AND (rezervasyon.oda_no="+odaNosu+")";
+                   
+                }
+                else{
+                    
+                    sql=sql+" where rezervasyon.oda_no="+odaNosu;
+                }
+          }
+          
+          
+      }
       
       
         t.tabloyuOlustur(sql, veri, tb);
@@ -341,8 +365,8 @@ public class musteriIslemleri extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField7;
     private javax.swing.JTable musteriTablo;
+    private javax.swing.JTextField odaNo;
     private javax.swing.JTextField tarihIki;
     private javax.swing.JTextField tarihIlk;
     // End of variables declaration//GEN-END:variables
