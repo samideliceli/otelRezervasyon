@@ -1,4 +1,12 @@
 package otelrezervasyon;
+import java.util.*;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 
 public class fırsatlar extends javax.swing.JPanel {
 
@@ -22,6 +30,11 @@ public class fırsatlar extends javax.swing.JPanel {
         jLabel3.setText("İndirim Oranı (%)");
 
         jButton1.setText("E-Posta Gönder");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -77,6 +90,22 @@ public class fırsatlar extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+         GMailSender sender = new GMailSender("graylightotel@gmail.com", "graylightotel***");
+
+
+                    try {
+                        sender.sendMail("GrayLight Oteli",
+                                "otelimize hoş geldiniz",
+                                "graylightotel@gmail.com",
+                                "samideliceli@gmail.com "
+                        );
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
