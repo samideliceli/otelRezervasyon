@@ -108,7 +108,7 @@ public class personelİslemleri extends javax.swing.JPanel {
     private void tabloyuDoldur(){
     
         t = new tableModel();
-        sql = " Select * From PERSONEL ";
+        sql = " Select p.AD,p.SOYAD,p.TC,g.GOREV_ADI,p.ISE_BASLAMA_TARIHI,p.BITIS_TARIHI,p.CINSIYET,p.SGK_NO,DURUM,p.CIKIS_NEDENI,p.KALAN_IZIN_HAKKı From PERSONEL as p,GOREV as g Where g.GOREV_Id=p.GOREV_ID";
         
         tb = new DefaultTableModel() {
             @Override
@@ -122,17 +122,18 @@ public class personelİslemleri extends javax.swing.JPanel {
         
         t.tabloyuOlustur(sql, veri, tb);
         jTablePersonel.setModel(tb);
+        
     }
     private void gorevCBEkle(){
         try {
             baglan.dbBaglan();
-            String gorevSql = " Select AD From GOREV ";
+            String gorevSql = " Select GOREV_ADI From GOREV ";
             PreparedStatement ps = con.prepareStatement(gorevSql, ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
             ps.executeQuery();
             ps.getResultSet().beforeFirst();
             while (ps.getResultSet().next()) {
-                jComboBoxGorev.addItem(ps.getResultSet().getString("AD"));
+                jComboBoxGorev.addItem(ps.getResultSet().getString("GOREV_ADI"));
             }
             con.close();
         } catch (SQLException ex) {
@@ -142,14 +143,14 @@ public class personelİslemleri extends javax.swing.JPanel {
     private void izinHakkıGorevID(){
         try {
             baglan.dbBaglan();
-            String gorevSql = " Select AD,IZIN_HAKKI,GOREV_ID From GOREV";
+            String gorevSql = " Select GOREV_ADI,IZIN_HAKKI,GOREV_ID From GOREV";
             PreparedStatement ps = con.prepareStatement(gorevSql, ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
             ps.executeQuery();
             ps.getResultSet().beforeFirst();
             while (ps.getResultSet().next()) {
                 
-                    if(ps.getResultSet().getString("AD").equals(jComboBoxGorev.getItemAt(jComboBoxGorev.getSelectedIndex()))){
+                    if(ps.getResultSet().getString("GOREV_ADI").equals(jComboBoxGorev.getItemAt(jComboBoxGorev.getSelectedIndex()))){
                        
                         jTextFieldIzinHakki.setText(ps.getResultSet().getString("IZIN_HAKKI"));
                         izinHakki = ps.getResultSet().getString("GOREV_ID");
