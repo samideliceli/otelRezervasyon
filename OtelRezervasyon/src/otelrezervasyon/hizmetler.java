@@ -16,7 +16,7 @@ import static otelrezervasyon.dbConnection.con;
 import static otelrezervasyon.dbConnection.st;
 
 public class hizmetler extends javax.swing.JPanel {
-
+    
     private dbConnection db;
     private int sutunSayisi, satirSayisi, i, satir, sutun;
     private DefaultTableModel tb;
@@ -28,7 +28,7 @@ public class hizmetler extends javax.swing.JPanel {
     private Vector veri;
     private tableModel t;
     private ResultSet rs;
-
+    
     public hizmetler() {
         initComponents();
         db = new dbConnection();
@@ -83,7 +83,7 @@ public class hizmetler extends javax.swing.JPanel {
         t.tabloyuOlustur(sql, veri, tb);
         servisTablosu.setModel(tb);
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -232,7 +232,7 @@ public class hizmetler extends javax.swing.JPanel {
             if (ps.executeUpdate() != 0) {
                 JOptionPane.showMessageDialog(null, "Veri Başarıyla Güncellendi!");
                 ((Object[]) veri.elementAt(satir))[sutun] = (String) sonDeger;
-
+                
             } else {
                 JOptionPane.showMessageDialog(null, "Hata Oluştu!");
             }
@@ -259,6 +259,7 @@ public class hizmetler extends javax.swing.JPanel {
         }
         yeniServiAdi.setText("");
         yeniServisUcret.setText("");
+        servisEkle.setEnabled(false);
         t.tabloyuOlustur(sql, veri, tb);
     }//GEN-LAST:event_servisEkleActionPerformed
 
