@@ -669,7 +669,7 @@ public class musteriEkle extends javax.swing.JFrame {
         isim = new javax.swing.JTextField();
         tc = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        cinsiyet = new javax.swing.JComboBox<>();
+        cinsiyet = new javax.swing.JComboBox<String>();
         baslangicTarih = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
@@ -684,8 +684,8 @@ public class musteriEkle extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         odaUcret = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        jComboBox1 = new javax.swing.JComboBox<String>();
+        jComboBox2 = new javax.swing.JComboBox<String>();
         jLabel11 = new javax.swing.JLabel();
         odaSorgula = new javax.swing.JButton();
         iptal = new javax.swing.JButton();
@@ -721,7 +721,7 @@ public class musteriEkle extends javax.swing.JFrame {
 
         jLabel1.setText("Cinsiyet");
 
-        cinsiyet.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Erkek", "Kadın" }));
+        cinsiyet.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Erkek", "Kadın" }));
         cinsiyet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cinsiyetActionPerformed(evt);
@@ -781,9 +781,9 @@ public class musteriEkle extends javax.swing.JFrame {
 
         odaUcret.setText("---");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3" }));
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3" }));
 
         jLabel11.setText("Seçilen Oda:");
 
@@ -922,12 +922,13 @@ public class musteriEkle extends javax.swing.JFrame {
                             .addComponent(jRadioButton2)
                             .addComponent(jRadioButton1))
                         .addGap(27, 27, 27)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel11)
-                            .addComponent(jLabel18)
-                            .addComponent(secilenOda)
-                            .addComponent(odaUcret)
-                            .addComponent(iptal))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(iptal, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel11)
+                                .addComponent(jLabel18)
+                                .addComponent(secilenOda)
+                                .addComponent(odaUcret)))
                         .addContainerGap())
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(50, 50, 50)

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,19 +24,20 @@ public class muhasebe extends javax.swing.JPanel {
     private DefaultTableModel tbGelir, tbGider;
     private tableModel t;
     private Object[] row;
-    private int gesutunSayisi, gesatirSayisi, i, gisutunSayisi, gisatirSayisi, gunlukToplamGelir = 0, gunlukToplamGider = 0;
+    private int gesutunSayisi, gesatirSayisi, i, gisutunSayisi, gisatirSayisi, gunlukToplamGelir = 0, gunlukToplamGider = 0, aylikToplamGelir = 0, aylikToplamGider = 0;
     private Vector gelir, gider;
     private String sql, sql2;
     private Date gununTarihi;
     private java.sql.Date sqldate, asqldate;
     private ResultSet rs, rs2, rs3, rs4;
     private KeyAdapter adapter;
+    private SimpleDateFormat formatter;
 
     public muhasebe() {
         initComponents();
         gununTarihi = new Date();
         sqldate = new java.sql.Date(gununTarihi.getTime());
-    
+
         System.out.println(asqldate);
         db = new dbConnection();
         t = new tableModel();
@@ -47,7 +49,7 @@ public class muhasebe extends javax.swing.JPanel {
         aylikGider.setEditable(false);
         gelirEkle.setEnabled(false);
         giderEkle.setEnabled(false);
-        
+
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         gelirilkTarih.setFormats(dateFormat);
         gelirikinciTarih.setFormats(dateFormat);
@@ -98,7 +100,6 @@ public class muhasebe extends javax.swing.JPanel {
     public void turleriCek() {
         try {
             db.dbBaglan();
-         
 
             String gelirTipleri = ("SELECT * FROM GELIR_TIP");
             PreparedStatement ps = con.prepareStatement(gelirTipleri, ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -121,6 +122,7 @@ public class muhasebe extends javax.swing.JPanel {
 
     public void gelirGiderCek() {
         try {
+            formatter = new SimpleDateFormat("dd-MM-yyyy");
             db.dbBaglan();
             rs = st.executeQuery("SELECT * FROM GELIR WHERE TARIH ='" + sqldate + "'");
             while (rs.next()) {
@@ -134,8 +136,24 @@ public class muhasebe extends javax.swing.JPanel {
             }
             gunlukGider.setText(String.valueOf(gunlukToplamGider) + " TL");
             Statement st3 = con.createStatement();
-
+            String s = sqldate.toString().substring(0, 8);
+            String tarih = s.concat("01");
+            Date date = formatter.parse(tarih);
+            asqldate = new java.sql.Date(date.getTime());
+            rs3 = st3.executeQuery("SELECT * FROM GELIR WHERE TARIH >='" + asqldate + "' AND TARIH <='" + sqldate + "'");
+            while (rs3.next()) {
+                aylikToplamGelir = aylikToplamGelir + rs3.getInt("GELIR");
+            }
+            aylikGelir.setText(String.valueOf(aylikToplamGelir) + " TL");
+            Statement st4 = con.createStatement();
+            rs4 = st4.executeQuery("SELECT * FROM GIDER WHERE TARIH >='" + asqldate + "' AND TARIH <='" + sqldate + "'");
+            while (rs4.next()) {
+                aylikToplamGider = aylikToplamGider + rs4.getInt("GIDER");
+            }
+            aylikGider.setText(String.valueOf(aylikToplamGider) + " TL");
         } catch (SQLException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
             Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -148,17 +166,17 @@ public class muhasebe extends javax.swing.JPanel {
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         gelirTablosu = new javax.swing.JTable();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        gunlukGelir = new javax.swing.JTextField();
-        aylikGelir = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
         gelirilkTarih = new org.jdesktop.swingx.JXDatePicker();
         jLabel6 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         gelirikinciTarih = new org.jdesktop.swingx.JXDatePicker();
-        listele = new javax.swing.JButton();
+        gelirListele = new javax.swing.JButton();
+        gelirSifirla = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        gunlukGelir = new javax.swing.JTextField();
+        aylikGelir = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         giderTablosu = new javax.swing.JTable();
@@ -167,11 +185,11 @@ public class muhasebe extends javax.swing.JPanel {
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         giderikinciTarih = new org.jdesktop.swingx.JXDatePicker();
-        listele1 = new javax.swing.JButton();
-        jPanel10 = new javax.swing.JPanel();
+        giderListele = new javax.swing.JButton();
+        giderSifirla = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
         gunlukGider = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
         aylikGider = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -206,46 +224,29 @@ public class muhasebe extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(gelirTablosu);
 
-        jLabel5.setText("Günlük Gelir :");
-
-        jLabel7.setText("Aylık Gelir :");
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel7))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(aylikGelir, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(gunlukGelir, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(gunlukGelir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(aylikGelir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Tarihe Göre Arama"));
 
         jLabel6.setText("İlk Tarih :");
 
         jLabel12.setText("İkinci Tarih :");
 
-        listele.setText("Listele");
+        gelirListele.setText("Listele");
+        gelirListele.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gelirListeleActionPerformed(evt);
+            }
+        });
+
+        gelirSifirla.setText("Sıfırla");
+        gelirSifirla.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gelirSifirlaActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Günlük Gelir :");
+
+        jLabel7.setText("Aylık Gelir :");
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -261,10 +262,20 @@ public class muhasebe extends javax.swing.JPanel {
                         .addGap(12, 12, 12)
                         .addComponent(gelirikinciTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(listele))
+                        .addComponent(gelirListele)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(gelirSifirla))
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addGap(9, 9, 9)
                         .addComponent(jLabel12)))
+                .addGap(26, 26, 26)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(gunlukGelir))
+                .addGap(46, 46, 46)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(aylikGelir))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
@@ -272,35 +283,37 @@ public class muhasebe extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(jLabel12))
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(gelirilkTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(gelirikinciTarih, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(listele))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(gelirilkTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(gelirListele)
+                        .addComponent(gelirSifirla)
+                        .addComponent(gunlukGelir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(aylikGelir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(gelirikinciTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -331,7 +344,23 @@ public class muhasebe extends javax.swing.JPanel {
 
         jLabel14.setText("İkinci Tarih :");
 
-        listele1.setText("Listele");
+        giderListele.setText("Listele");
+        giderListele.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                giderListeleActionPerformed(evt);
+            }
+        });
+
+        giderSifirla.setText("Sıfırla");
+        giderSifirla.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                giderSifirlaActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setText("Günlük Gider :");
+
+        jLabel10.setText("Aylık Gider :");
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -347,60 +376,39 @@ public class muhasebe extends javax.swing.JPanel {
                         .addGap(12, 12, 12)
                         .addComponent(giderikinciTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(listele1))
+                        .addComponent(giderListele)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(giderSifirla))
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addGap(9, 9, 9)
                         .addComponent(jLabel14)))
+                .addGap(26, 26, 26)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(gunlukGider))
+                .addGap(46, 46, 46)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(aylikGider))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
+            .addGroup(jPanel9Layout.createSequentialGroup()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
-                    .addComponent(jLabel14))
+                    .addComponent(jLabel14)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(giderilkTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(giderikinciTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(listele1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jLabel8.setText("Günlük Gider :");
-
-        jLabel10.setText("Aylık Gider :");
-
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel10Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(aylikGider, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(gunlukGider, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel10Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(gunlukGider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(giderListele)
+                    .addComponent(giderSifirla)
+                    .addComponent(gunlukGider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(aylikGider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -408,14 +416,12 @@ public class muhasebe extends javax.swing.JPanel {
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addComponent(jScrollPane2)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
                 .addGap(9, 9, 9))
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -423,9 +429,7 @@ public class muhasebe extends javax.swing.JPanel {
                 .addGap(36, 36, 36)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -497,10 +501,11 @@ public class muhasebe extends javax.swing.JPanel {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(50, 50, 50)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(gelirTur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(gelirTur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(gelirTutar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -568,7 +573,7 @@ public class muhasebe extends javax.swing.JPanel {
                     .addComponent(jLabel4))
                 .addGap(33, 33, 33)
                 .addComponent(giderEkle)
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -607,9 +612,9 @@ public class muhasebe extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -634,6 +639,8 @@ public class muhasebe extends javax.swing.JPanel {
         t.tabloyuOlustur(sql, gelir, tbGelir);
         gunlukToplamGelir = gunlukToplamGelir + Integer.valueOf((String) tutar);
         gunlukGelir.setText(String.valueOf(gunlukToplamGelir) + " TL");
+        aylikToplamGelir = aylikToplamGelir + Integer.valueOf((String) tutar);
+        aylikGelir.setText(String.valueOf(aylikToplamGelir) + " TL");
     }//GEN-LAST:event_gelirEkleActionPerformed
 
     private void giderEkleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_giderEkleActionPerformed
@@ -656,6 +663,8 @@ public class muhasebe extends javax.swing.JPanel {
         t.tabloyuOlustur(sql2, gider, tbGider);
         gunlukToplamGider = gunlukToplamGider + Integer.valueOf((String) tutar);
         gunlukGider.setText(String.valueOf(gunlukToplamGider) + " TL");
+        aylikToplamGider = aylikToplamGider + Integer.valueOf((String) tutar);
+        aylikGider.setText(String.valueOf(aylikToplamGider) + " TL");
     }//GEN-LAST:event_giderEkleActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
@@ -694,17 +703,87 @@ public class muhasebe extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_giderilkTarihActionPerformed
 
+    private void gelirListeleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gelirListeleActionPerformed
+        formatter = new SimpleDateFormat("dd-MM-yyyy");
+        java.sql.Date sqlDate, sqlDate2;
+
+        try {
+            String date = formatter.format(gelirilkTarih.getDate()).toString();
+            String date2 = formatter.format(gelirikinciTarih.getDate()).toString();
+
+            Date datex = formatter.parse(date);
+            Date datey = formatter.parse(date2);
+
+            sqlDate = new java.sql.Date(datex.getTime());
+            sqlDate2 = new java.sql.Date(datey.getTime());
+            String sorgu = "SELECT * FROM GELIR WHERE TARIH BETWEEN '" + sqlDate + "' AND '" + sqlDate2 + "'";
+            db.dbBaglan();
+            st.executeQuery(sorgu);
+            t.tabloyuOlustur(sorgu, gelir, tbGelir);
+            gelirTablosu.setModel(tbGelir);
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_gelirListeleActionPerformed
+
+    private void gelirSifirlaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gelirSifirlaActionPerformed
+        t.tabloyuOlustur(sql, gelir, tbGelir);
+        gelirTablosu.setModel(tbGelir);
+        gelirilkTarih.setDate(null);
+        gelirikinciTarih.setDate(null);
+    }//GEN-LAST:event_gelirSifirlaActionPerformed
+
+    private void giderListeleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_giderListeleActionPerformed
+        formatter = new SimpleDateFormat("dd-MM-yyyy");
+        java.sql.Date sqlDate, sqlDate2;
+
+        try {
+            String date = formatter.format(giderilkTarih.getDate()).toString();
+            String date2 = formatter.format(giderikinciTarih.getDate()).toString();
+
+            Date datex = formatter.parse(date);
+            Date datey = formatter.parse(date2);
+
+            sqlDate = new java.sql.Date(datex.getTime());
+            sqlDate2 = new java.sql.Date(datey.getTime());
+            String sorgu = "SELECT * FROM GIDER WHERE TARIH BETWEEN '" + sqlDate + "' AND '" + sqlDate2 + "'";
+            db.dbBaglan();
+            st.executeQuery(sorgu);
+            t.tabloyuOlustur(sorgu, gider, tbGider);
+            giderTablosu.setModel(tbGider);
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_giderListeleActionPerformed
+
+    private void giderSifirlaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_giderSifirlaActionPerformed
+        t.tabloyuOlustur(sql2, gider, tbGider);
+        giderTablosu.setModel(tbGider);
+        giderilkTarih.setDate(null);
+        giderikinciTarih.setDate(null);
+    }//GEN-LAST:event_giderSifirlaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField aylikGelir;
     private javax.swing.JTextField aylikGider;
     private javax.swing.JButton gelirEkle;
+    private javax.swing.JButton gelirListele;
+    private javax.swing.JButton gelirSifirla;
     private javax.swing.JTable gelirTablosu;
     private javax.swing.JComboBox gelirTur;
     private javax.swing.JTextField gelirTutar;
     private org.jdesktop.swingx.JXDatePicker gelirikinciTarih;
     private org.jdesktop.swingx.JXDatePicker gelirilkTarih;
     private javax.swing.JButton giderEkle;
+    private javax.swing.JButton giderListele;
+    private javax.swing.JButton giderSifirla;
     private javax.swing.JTable giderTablosu;
     private javax.swing.JComboBox giderTur;
     private javax.swing.JTextField giderTutar;
@@ -727,18 +806,14 @@ public class muhasebe extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JButton listele;
-    private javax.swing.JButton listele1;
     // End of variables declaration//GEN-END:variables
 }

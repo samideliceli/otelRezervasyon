@@ -8,12 +8,9 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import static otelrezervasyon.dbConnection.con;
-import static otelrezervasyon.dbConnection.st;
 
 public class hizmetler extends javax.swing.JPanel {
     
