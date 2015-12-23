@@ -1,3 +1,6 @@
 /OtelRezervasyon/nbproject/
 /OtelRezervasyon/build/
 /OtelRezervasyon/dist/
+*.properties
+*.properties
+OtelRezervasyon/nbproject/project.properties
