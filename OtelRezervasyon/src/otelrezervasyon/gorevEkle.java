@@ -8,10 +8,13 @@ package otelrezervasyon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import static otelrezervasyon.dbConnection.con;
 
@@ -27,6 +30,7 @@ public class gorevEkle extends javax.swing.JPanel {
     private String sql;
     private  DefaultTableModel tb;
     private Vector veri;
+    private Integer gorevId;
     /**
      * Creates new form gorevEkle
      */
@@ -36,7 +40,7 @@ public class gorevEkle extends javax.swing.JPanel {
         baglan = new dbConnection();
         
         tabloDoldur();
-        
+     
         adapter = new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -48,12 +52,15 @@ public class gorevEkle extends javax.swing.JPanel {
                 else{
                     jButtonGorevEkle.setEnabled(false);
                 }
+                
+                
             }
            
         };
         jTextFieldGorevAdi.addKeyListener(adapter);
         jTextFieldIzinHakki.addKeyListener(adapter);
         jTextFieldMaas.addKeyListener(adapter);
+        jTableGorev.addKeyListener(adapter);
     }
     private boolean textDoluMU(){
         gorev = jTextFieldGorevAdi.getText();
@@ -110,7 +117,7 @@ public class gorevEkle extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTableGorev = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        jButtonGuncelle = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -209,9 +216,20 @@ public class gorevEkle extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3"
             }
         ));
+        jTableGorev.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableGorevMouseClicked(evt);
+            }
+        });
         jScrollPane3.setViewportView(jTableGorev);
 
-        jButton1.setText("Güncelle");
+        jButtonGuncelle.setText("Güncelle");
+        jButtonGuncelle.setEnabled(false);
+        jButtonGuncelle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonGuncelleActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Sil");
 
@@ -226,7 +244,7 @@ public class gorevEkle extends javax.swing.JPanel {
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(141, 141, 141)
-                        .addComponent(jButton1)
+                        .addComponent(jButtonGuncelle)
                         .addGap(18, 18, 18)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -237,7 +255,7 @@ public class gorevEkle extends javax.swing.JPanel {
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(jButtonGuncelle)
                     .addComponent(jButton2))
                 .addGap(0, 12, Short.MAX_VALUE))
         );
@@ -281,11 +299,56 @@ public class gorevEkle extends javax.swing.JPanel {
          tabloDoldur();
     }//GEN-LAST:event_jButtonGorevEkleActionPerformed
 
+    private void jButtonGuncelleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuncelleActionPerformed
+        baglan.dbBaglan();
+        String sql = ("UPDATE GOREV SET GOREV_ADI='"+jTextFieldGorevAdi.getText()+"',MAAS="+Integer.parseInt(jTextFieldMaas.getText())+",IZIN_HAKKI="+Integer.parseInt(jTextFieldIzinHakki.getText())+" WHERE GOREV_ID="+gorevId);
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            JFrame j=new JFrame();
+            j.setAlwaysOnTop(true);
+            j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            j.setVisible(true);
+            
+            if (ps.executeUpdate() != 0) {
+                JOptionPane.showMessageDialog(j, "Veri Başarıyla Güncellendi!");
+                
+            } else {
+                JOptionPane.showMessageDialog(j, "Hata Oluştu!");
+            }
+            jButtonGuncelle.setEnabled(false);
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(gorevEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+     
+        jTableGorev.removeAll();
+        tabloDoldur();
+    }//GEN-LAST:event_jButtonGuncelleActionPerformed
+
+    private void jTableGorevMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableGorevMouseClicked
+        try {
+            baglan.dbBaglan();
+            String gorevSql = " Select * From GOREV ";
+            PreparedStatement ps = con.prepareStatement(gorevSql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+            ps.executeQuery();
+            ps.getResultSet().absolute(jTableGorev.getSelectedRow()+1);
+            jTextFieldGorevAdi.setText(ps.getResultSet().getString("GOREV_ADI"));
+            jTextFieldMaas.setText(ps.getResultSet().getString("MAAS"));
+            jTextFieldIzinHakki.setText(ps.getResultSet().getString("IZIN_HAKKI"));
+            gorevId = ps.getResultSet().getInt("GOREV_ID");
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        jButtonGuncelle.setEnabled(true);
+    }//GEN-LAST:event_jTableGorevMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonGorevEkle;
+    private javax.swing.JButton jButtonGuncelle;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
