@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -91,7 +92,14 @@ public class gorevEkle extends javax.swing.JPanel {
         t.tabloyuOlustur(sql, veri, tb);
         jTableGorev.setModel(tb);
     }
-
+    private void uyariDialog(String baslik,String mesaj){
+        JOptionPane op = new JOptionPane(mesaj,JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = op.createDialog(baslik);
+        dialog.setAlwaysOnTop(true); //<-- this line
+        dialog.setModal(true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -286,7 +294,7 @@ public class gorevEkle extends javax.swing.JPanel {
         
         baglan.dbBaglan();
          try {
-            String sql = "INSERT INTO GOREV (AD,MAAS,IZIN_HAKKI) VALUES (?,?,?)";
+            String sql = "INSERT INTO GOREV (GOREV_ADI,MAAS,IZIN_HAKKI) VALUES (?,?,?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, gorev);
             ps.setInt(2, Integer.parseInt(maas));
@@ -297,24 +305,22 @@ public class gorevEkle extends javax.swing.JPanel {
             Logger.getLogger(gorevEkle.class.getName()).log(Level.SEVERE, null, ex);
         }
          tabloDoldur();
+         jButtonGuncelle.setEnabled(false);
     }//GEN-LAST:event_jButtonGorevEkleActionPerformed
 
     private void jButtonGuncelleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuncelleActionPerformed
         baglan.dbBaglan();
         String sql = ("UPDATE GOREV SET GOREV_ADI='"+jTextFieldGorevAdi.getText()+"',MAAS="+Integer.parseInt(jTextFieldMaas.getText())+",IZIN_HAKKI="+Integer.parseInt(jTextFieldIzinHakki.getText())+" WHERE GOREV_ID="+gorevId);
         try {
-            PreparedStatement ps = con.prepareStatement(sql);
-            JFrame j=new JFrame();
-            j.setAlwaysOnTop(true);
-            j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            j.setVisible(true);
+            PreparedStatement ps = con.prepareStatement(sql);          
             
             if (ps.executeUpdate() != 0) {
-                JOptionPane.showMessageDialog(j, "Veri Başarıyla Güncellendi!");
+                uyariDialog("Mesaj","Veri Başarıyla Güncellendi!");
                 
             } else {
-                JOptionPane.showMessageDialog(j, "Hata Oluştu!");
+                uyariDialog("Mesaj","Hata Oluştu!");
             }
+       
             jButtonGuncelle.setEnabled(false);
             con.close();
         } catch (SQLException ex) {
