@@ -10,6 +10,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.PreparedStatement;
@@ -24,7 +26,6 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 /**
  *
@@ -51,21 +52,65 @@ public class musteriEkle extends javax.swing.JFrame {
     private ResultSet rs;
     private Statement st,st2;
     private boolean odaSecildi=false;
-    private boolean eskiMusteri;
+    private boolean eskiMusteri,rezVar=false;
+    private boolean  kralOdaSecildi=false;
+    private long toplamGun;
     
     
-    int fiyat=0;
+    
     /**
      * Creates new form musteriEkle
      */
     public musteriEkle() {
         kontrol = new textKontrolleri();
         initComponents();
+        
         db=new dbConnection();
+        db.dbBaglan();
+        
         buttonGroup1.add(jRadioButton1);
         buttonGroup1.add(jRadioButton2);
         
-       
+        buttonGroup2.add(normalRadio);
+        buttonGroup2.add(kralRadio);
+      
+        kralRadio.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent ıe) {
+            kralOdaSecildi=true;
+            jLabel12.setVisible(false);
+            kisiSayisiCombo.setVisible(false);
+            }
+        });
+        
+        normalRadio.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent ıe) {
+                try {
+                        kralOdaSecildi=false;
+                        jLabel12.setVisible(true);
+                        kisiSayisiCombo.setVisible(true);
+                        kisiSayisiCombo.removeAllItems();
+
+                        st=dbConnection.getSt();
+                        rs=st.executeQuery("SELECT kapasite FROM oda_tipi "
+                                + "WHERE tur='"+"Normal"+"'"+" ORDER BY kapasite ASC");
+
+
+                        while(rs.next())   
+                        {
+                            int kapasite=rs.getInt("kapasite");
+                            kisiSayisiCombo.addItem(kapasite+"");
+                        }
+
+                } catch (SQLException ex) {
+                    Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            
+            
+            
+            }
+        });
         
         kaydet.setEnabled(false);
         adapter = new KeyAdapter() {
@@ -85,6 +130,8 @@ public class musteriEkle extends javax.swing.JFrame {
             }  
         };
         
+        normalRadio.setSelected(true);
+        
         
         tarihAdapter = new KeyAdapter() {
            @Override
@@ -96,14 +143,17 @@ public class musteriEkle extends javax.swing.JFrame {
                        }
                        else {
                            odaSorgula.setEnabled(false);
+                           odaBilgileriniTemizle();
+                           tc.setEnabled(false);
+                           tc.setText("");
                        }
                } else{ 
+                   odaBilgileriniTemizle();
                    odaSorgula.setEnabled(false);
+                   tc.setEnabled(false);
+                   tc.setText("");
                }
            }  
-
-
-
 
        };
         
@@ -115,7 +165,7 @@ public class musteriEkle extends javax.swing.JFrame {
                 if (kontrol.tcKontrol(tcText)) {
                     
                     try {
-                        db.dbBaglan();
+                        
                         st=dbConnection.getSt();
                         rs=st.executeQuery("SELECT ad,soyad,cinsiyet,telefon,email FROM musteri "
                                 + "WHERE tc='"+tcText+"'");
@@ -123,61 +173,90 @@ public class musteriEkle extends javax.swing.JFrame {
                         
                         while(rs.next())
                         {
-                         i++;
-                         isimText=rs.getString("ad");
-                         isim.setText(isimText);
-                         isim.setEnabled(false);
-                         
-                         soyIsimText=rs.getString("soyad");
-                         soyisim.setText(soyIsimText);
-                         soyisim.setEnabled(false);
-                         
-                         telefonText=rs.getString("telefon");
-                         telefon.setText(telefonText);
-                         telefon.setEnabled(false);
-                         
-                         emailText=rs.getString("email");
-                         email.setText(emailText);
-                         email.setEnabled(false);
-                         
-                         String cinsiyetText=rs.getString("cinsiyet");
-                         
-                         if(cinsiyetText.equals("e")){
-                         
-                             cinsiyet.setSelectedIndex(0);
-                         
-                         }
-                         else{
-                            cinsiyet.setSelectedIndex(1);
-                         }
-                         
-                         
-                         kaydet.setEnabled(true);
-                         
-                         baslangicTarih.setEnabled(false);
-                         bitisTarih.setEnabled(false);
-                         
-                         eskiMusteri=true;
-                         
-                         iptal.setVisible(true);
-                        }
-                        
-                        if(i==0){
-                        
-                         eskiMusteri=false;
+                            i++;
                             
-                         isim.setText("");
-                         isim.setEnabled(true);
-                         
-                         soyisim.setText("");
-                         soyisim.setEnabled(true);
-                         
-                         telefon.setText("");
-                         telefon.setEnabled(true);
-                         
-                         email.setText("");
-                         email.setEnabled(true);
+                            int id=otelBilgileriniKaydet(tcText);
+                            
+                            
+                            
+                            if(ilisikkesildimi(id) ){                  
+                                isimText=rs.getString("ad");
+                                isim.setText(isimText);
+                                isim.setEnabled(false);
+
+                                soyIsimText=rs.getString("soyad");
+                                soyisim.setText(soyIsimText);
+                                soyisim.setEnabled(false);
+
+                                telefonText=rs.getString("telefon");
+                                telefon.setText(telefonText);
+                                telefon.setEnabled(false);
+
+                                emailText=rs.getString("email");
+                                email.setText(emailText);
+                                email.setEnabled(false);
+
+                                String cinsiyetText=rs.getString("cinsiyet");
+
+                                if(cinsiyetText.equals("e")){
+
+                                    cinsiyet.setSelectedIndex(0);
+
+                                }
+                                else{
+                                   cinsiyet.setSelectedIndex(1);
+                                }
+
+
+                                kaydet.setEnabled(true);
+
+                                baslangicTarih.setEnabled(false);
+                                bitisTarih.setEnabled(false);
+
+                                eskiMusteri=true;
+                                iptal.setVisible(true);
+                            }
+                            else{
+                            
+                            JOptionPane.showMessageDialog(null, "Müşteri ilişiği kesilmemiş");
+                           
+                            isim.setEnabled(false);
+                            soyisim.setText(soyIsimText);
+                            soyisim.setEnabled(false);;
+                            telefon.setText(telefonText);
+                            telefon.setEnabled(false);
+                            email.setEnabled(false);
+                            }
                         }
+                            
+                           if(i==0){
+
+                                eskiMusteri=false;
+
+                                isim.setText("");
+                                isim.setEnabled(true);
+
+                                soyisim.setText("");
+                                soyisim.setEnabled(true);
+
+                                telefon.setText("");
+                                telefon.setEnabled(true);
+
+                                email.setText("");
+                                email.setEnabled(true);
+                             }
+                           
+                           if(rezervasyondaVar(tcText)){
+                           JOptionPane.showMessageDialog(null, "Rezervasyonda kayıt var.");
+                           
+                            isim.setEnabled(false);
+                            soyisim.setText(soyIsimText);
+                            soyisim.setEnabled(false);;
+                            telefon.setText(telefonText);
+                            telefon.setEnabled(false);
+                            email.setEnabled(false);
+                           
+                           }
                         
                     } catch (SQLException ex) {
                         Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
@@ -187,6 +266,10 @@ public class musteriEkle extends javax.swing.JFrame {
                     
                 }
             }  
+
+           
+
+            
         };
         
         odaSorgula.setEnabled(false);
@@ -202,6 +285,11 @@ public class musteriEkle extends javax.swing.JFrame {
         bitisTarih.addKeyListener(tarihAdapter);
       
         }
+    
+    
+    
+    
+  
     
       private void verileriBosalt(){
           
@@ -301,7 +389,7 @@ public class musteriEkle extends javax.swing.JFrame {
     private int otelBilgileriniKaydet(String tc) {
         
         String sql="";
-        db.dbBaglan();
+        
         st=dbConnection.getSt();
         try {
             rs=st.executeQuery("SELECT * FROM musteri WHERE tc='"+tcText+"'");  
@@ -319,12 +407,81 @@ public class musteriEkle extends javax.swing.JFrame {
         
         return -1;
     }
-
+    
+     private int konakSayisi(int id) {
+       
+        
+        st=dbConnection.getSt();
+        try {
+            rs=st.executeQuery("SELECT konak_sayisi FROM musteri_otel_bilgileri WHERE musteri_id="+id);  
+            
+            while(rs.next())
+            {
+                int konakSayisi = rs.getInt("konak_sayisi");
+                return konakSayisi;
+            }
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return -1;
+    }
+    
+    
+     private boolean ilisikkesildimi(int id) {
+         
+         
+        
+        st=dbConnection.getSt();
+        try {
+            rs=st.executeQuery("SELECT iliski_kesim FROM musteri_otel_bilgileri WHERE musteri_id="+id);  
+            
+            while(rs.next())
+            {
+                boolean iliskiKesim = rs.getBoolean("iliski_kesim");
+                return iliskiKesim;
+            }
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         
+         return false; }
+     
+        private boolean rezervasyondaVar(String tc) {
+        
+                   
+         st=dbConnection.getSt();
+        try {
+            rs=st.executeQuery("SELECT * FROM rezervasyon WHERE tc='"+tc+"'");  
+            int i=0;
+            while(rs.next())
+            {
+                i++;
+                
+            }
+            
+            if(i==0){
+                return false;
+            }{
+                return true;
+            }
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }  
+          
+        return false;
+      }
     
     private void musteriKaydet() {
      String sql="Insert INTO musteri (AD,SOYAD,CINSIYET,TC,TELEFON,EMAIL,INDIRIM_MIKTARI) "
                 + "VALUES (?,?,?,?,?,?,?)";
-        db.dbBaglan();
+        
         String cinsiyet;
         
         onOdemeText=onOdeme.getText();
@@ -358,9 +515,13 @@ public class musteriEkle extends javax.swing.JFrame {
                  
                 
                 int id=otelBilgileriniKaydet(tcText) ;
+                
+                int konaksayisi=konakSayisi(id);
                  
-                String sql2="UPDATE  musteri_otel_bilgileri SET ODA_NO="+secilenOdaText+", ON_ODEME_TUTAR="+onOdemeText
-                        + ", BASLANGIC_TARIHI='"+sqldate+"', BITIS_TARIHI='"+sqldate2+"', ILISKI_KESIM=false, KONAK_SAYISI=5 WHERE musteri_id="+id;
+                String sql2="UPDATE  musteri_otel_bilgileri SET ODA_NO="+secilenOdaText
+                        +",ON_ODEME_TUTAR="+onOdemeText+ ", BASLANGIC_TARIHI='"+sqldate
+                        +"', BITIS_TARIHI='"+sqldate2+"', ILISKI_KESIM=false, KONAK_SAYISI="+(konaksayisi+1)
+                        + " WHERE musteri_id="+id;
                 
                 ps =dbConnection.getCon().prepareStatement(sql2);
                
@@ -378,15 +539,12 @@ public class musteriEkle extends javax.swing.JFrame {
                 ps.setString(6, emailText);
                 ps.setInt(7, 0);
                 ps.executeUpdate();
-
-
+                
 
                 int id = otelBilgileriniKaydet(tcText);
               
-
-
-
-                String sql2="Insert INTO musteri_otel_bilgileri (MUSTERI_ID,ODA_NO,ON_ODEME_TUTAR,BASLANGIC_TARIHI,BITIS_TARIHI,"
+                String sql2="Insert INTO musteri_otel_bilgileri (MUSTERI_ID,ODA_NO,"
+                        + "ON_ODEME_TUTAR,BASLANGIC_TARIHI,BITIS_TARIHI,"
                         + "ILISKI_KESIM,KONAK_SAYISI) VALUES (?,?,?,?,?,?,?)";
 
                 ps =dbConnection.getCon().prepareStatement(sql2);
@@ -418,7 +576,7 @@ public class musteriEkle extends javax.swing.JFrame {
         String sql="Insert INTO rezervasyon (AD,SOYAD,CINSIYET,TC,TELEFON,"
                 + "EMAIL,BASLANGIC_TARIHI,BITIS_TARIHI,ODEME_TUTARI,ODA_NO) "
                 + "VALUES (?,?,?,?,?,?,?,?,?,?)";
-        db.dbBaglan();
+        
         String cinsiyet;
         onOdemeText=onOdeme.getText();
         
@@ -471,11 +629,11 @@ public class musteriEkle extends javax.swing.JFrame {
 
     
     
-    private void odalariDoldur(String tablo) { 
+    private boolean odaBosmu(int odaNo, String tablo) { 
         
-        db.dbBaglan();
         st=dbConnection.getSt();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");  
+        ResultSet rs3 = null;
         
         java.sql.Date sqldate2=null,sqldate=null;
            try {
@@ -490,99 +648,46 @@ public class musteriEkle extends javax.swing.JFrame {
                Logger.getLogger(musteriIslemleri.class.getName()).log(Level.SEVERE, null, ex);
            }
         
-        
-        ResultSet  rs2;
-        int eskiKat=0;
-       
-        Color background;
+      
         
         try {
             st2 = dbConnection.getCon().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
   
-            rs=st.executeQuery("SELECT oda_no FROM "+tablo+" WHERE "
-                    + "baslangic_tarihi>='"+sqldate+"' AND bitis_tarihi<='"+sqldate2+"'");  
+            rs3=st2.executeQuery("SELECT oda_no FROM "+tablo+" WHERE "
+                    + "(baslangic_tarihi>='"+sqldate+"' AND bitis_tarihi<='"+sqldate2+"') "
+            +"AND oda_no="+odaNo);  
            
-            while(rs.next())
+           int i=0;
+            while(rs3.next())
             {
-               final String odaNo=rs.getString("oda_no");
-               int kat=Integer.valueOf(odaNo.substring(0,1));
-               
-               int sira=Integer.valueOf(odaNo)-(kat*100);
-               //final int durum=rs.getInt("durum_id");
-               
-                System.out.println(odaNo);
-               
-               if(eskiKat!=kat){
-                   JLabel katText=new JLabel();
-                   katText.setText("KAT "+kat);
-                   katText.setFont(new Font("Century Schoolbook L", Font.PLAIN, 12));
-                   katText.setBounds(15, 60*(kat-1), 55, 30);
-                   katText.setForeground(new Color(33,41,47));
-                   eskiKat=kat;
-                   odalar.add(katText);
-               }
-               
-               /*final String odaTip=rs.getString("tip_id");
-                rs2 = st2.executeQuery("SELECT fiyat FROM oda_tipi WHERE tip_id="+odaTip);
-                try {
-                    while(rs2.next())
-                    {
-                        fiyat=rs2.getInt("fiyat");
-                    }
-                }
-                finally{
-                    rs2.close();
-                }
-               */
-               final int a=100;
-               
-               
-               background=new Color(189,54,47);
-               
-               
-               JButton oda=new JButton();
-               oda.setText(odaNo);
-               oda.setForeground(Color.WHITE);
-               oda.setBackground(background);
-               oda.setBounds((55*sira)+10, 30+((kat-1)*60), 55, 30);
-               oda.addActionListener(new ActionListener() {
-                   @Override
-                   public void actionPerformed(ActionEvent ae) {
-                   
-                     JOptionPane.showMessageDialog(null, "Oda Bu Tarihler Arasında Dolu");
-                           
-                       
-                   
-                   }
-               });
-               
-               odalar.add(oda);
+              i++;
                
                
             }
             
+            return i==0;
             
         } catch (SQLException ex) {
             Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
         }
+    
         
-        
-                
-        
-       
-        
+        return false;
+              
     }
     
   private void bosOdalariDoldur(){
       
-       db.dbBaglan();
+       
        st=dbConnection.getSt();
-       Color background=new Color(91,155,30);
+       Color background;
        
        
        int eskiKat=0;
         try {  
-            rs=st.executeQuery("SELECT oda_no,kat FROM oda ");
+            String sql="SELECT oda_no,kat,tip_id FROM oda";
+            
+            rs=st.executeQuery(sql);
             
             while(rs.next())
             {
@@ -604,37 +709,108 @@ public class musteriEkle extends javax.swing.JFrame {
                
                
                
-               JButton oda=new JButton();
-               oda.setText(odaNo);
-               oda.setForeground(Color.WHITE);
-               oda.setBackground(background);
-               oda.setBounds((55*sira)+10, 30+((kat-1)*60), 55, 30);
+               final boolean musBos=odaBosmu(Integer.valueOf(odaNo), "musteri_otel_bilgileri");
+               final boolean odaBos=musBos && odaBosmu(Integer.valueOf(odaNo), "rezervasyon");
                
-               oda.addActionListener(new ActionListener() {
+               if(odaBos){
+               
+                   background=new Color(91,155,30); 
+               }else{
+                   background=new Color(189,54,47);
+               }
+               
+               
+               final String odaTip=rs.getString("tip_id");
+               int fiyat=0;
+               String tur="---";
+               int kapasite=0; 
+               
+            
+               
+               ResultSet  rs2;
+               rs2 = st2.executeQuery("SELECT fiyat,kapasite,tur FROM oda_tipi WHERE tip_id="+odaTip);
+               
+                try {
+                    while(rs2.next())
+                    {
+                        fiyat=rs2.getInt("fiyat");
+                        kapasite=rs2.getInt("kapasite");
+                        tur=rs2.getString("tur");
+                    }
+                }
+                finally{
+                    rs2.close();
+                }
+               
+               final int a = fiyat;
+               final int kapasiteOda=kapasite;
+               final String turOda=tur;
+                              
+                ActionListener ac=new ActionListener() {
                    @Override
                    public void actionPerformed(ActionEvent ae) {
                    
                      
-                           
-                           onOdeme.setText((10*15/100)+"");
-                           odaUcret.setText(10+"₺");
-                           secilenOda.setText(""+odaNo);
-                           secilenOdaText=Integer.valueOf(odaNo);
-                           odaSecildi=true;
-                           
-                           tc.setEnabled(true);
-                           
-                           if(degerKontrolleri()){
-                           
-                           kaydet.setEnabled(true);
+                           if(odaBos){
+                            onOdeme.setText((toplamGun*a*15/100)+"");
+                            odaUcret.setText(a+"₺");
+                            toplamUcret.setText(toplamGun*a+"");
+                            secilenOda.setText(""+odaNo);
+                            secilenOdaText=Integer.valueOf(odaNo);
+                            //kisiSayisi.setText(kapasiteOda+"");
+                            //odaTuru.setText(turOda);
+                            odaSecildi=true;
+
+                            tc.setEnabled(true);
+
+                            if(degerKontrolleri()){
+
+                            kaydet.setEnabled(true);
+                            
+                            }
+                            
                            }
-                           
+                           else{
+                                JOptionPane.showMessageDialog(null, "Oda dolu");
+                          
+                           }
                        
                    
                    }
-               });
+               };
                
-               odalar.add(oda);
+               
+               if(!kralOdaSecildi){
+                    int kisiSayisi=Integer.valueOf(kisiSayisiCombo.getSelectedItem().toString());
+                    if(kisiSayisi==kapasite){
+                     
+                        JButton oda=new JButton();
+                        oda.setText(odaNo);
+                        oda.setForeground(Color.WHITE);
+                        oda.setBackground(background);
+                        oda.setBounds((55*sira)+10, 30+((kat-1)*60), 55, 30);
+                        
+                        odalar.add(oda);
+                        oda.addActionListener(ac);
+                    }
+                 }
+                 
+                 else{
+                     
+                     if(turOda.equals("Kral")){
+                        JButton oda=new JButton();
+                        oda.setText(odaNo);
+                        oda.setForeground(Color.WHITE);
+                        oda.setBackground(background);
+                        oda.setBounds((55*sira)+10, 30+((kat-1)*60), 55, 30);
+                     
+                        odalar.add(oda);
+                        oda.addActionListener(ac);
+                     }
+                 
+                 }
+               
+               
             }
             
         } catch (SQLException ex) {
@@ -655,10 +831,10 @@ public class musteriEkle extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -669,7 +845,7 @@ public class musteriEkle extends javax.swing.JFrame {
         isim = new javax.swing.JTextField();
         tc = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        cinsiyet = new javax.swing.JComboBox<String>();
+        cinsiyet = new javax.swing.JComboBox<>();
         baslangicTarih = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
@@ -681,14 +857,17 @@ public class musteriEkle extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         secilenOda = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         odaUcret = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<String>();
-        jComboBox2 = new javax.swing.JComboBox<String>();
         jLabel11 = new javax.swing.JLabel();
         odaSorgula = new javax.swing.JButton();
         iptal = new javax.swing.JButton();
+        jLabel12 = new javax.swing.JLabel();
+        normalRadio = new javax.swing.JRadioButton();
+        kralRadio = new javax.swing.JRadioButton();
+        kisiSayisiCombo = new javax.swing.JComboBox<>();
+        jLabel13 = new javax.swing.JLabel();
+        toplamUcret = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Müşteri Ekle");
@@ -697,8 +876,6 @@ public class musteriEkle extends javax.swing.JFrame {
         jLabel2.setText("TC");
 
         jLabel3.setText("İsim");
-
-        jLabel4.setText("Yetişkin");
 
         jLabel5.setText("Telefon");
 
@@ -721,7 +898,7 @@ public class musteriEkle extends javax.swing.JFrame {
 
         jLabel1.setText("Cinsiyet");
 
-        cinsiyet.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Erkek", "Kadın" }));
+        cinsiyet.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Erkek", "Kadın" }));
         cinsiyet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cinsiyetActionPerformed(evt);
@@ -740,7 +917,6 @@ public class musteriEkle extends javax.swing.JFrame {
             }
         });
 
-        onOdeme.setText("45");
         onOdeme.setEnabled(false);
         onOdeme.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -768,22 +944,16 @@ public class musteriEkle extends javax.swing.JFrame {
             .addGroup(odalarLayout.createSequentialGroup()
                 .addGap(45, 45, 45)
                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(204, Short.MAX_VALUE))
+                .addContainerGap(243, Short.MAX_VALUE))
         );
 
         secilenOda.setText("---");
 
         jLabel15.setText("Soyisim");
 
-        jLabel16.setText("Çocuk");
-
-        jLabel18.setText("Ücret:");
+        jLabel18.setText("Günlük:");
 
         odaUcret.setText("---");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3" }));
-
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3" }));
 
         jLabel11.setText("Seçilen Oda:");
 
@@ -801,6 +971,24 @@ public class musteriEkle extends javax.swing.JFrame {
             }
         });
 
+        jLabel12.setText("Kişi:");
+
+        normalRadio.setText("Normal");
+        normalRadio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                normalRadioActionPerformed(evt);
+            }
+        });
+
+        kralRadio.setSelected(true);
+        kralRadio.setText("Kral");
+
+        kisiSayisiCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel13.setText("Toplam:");
+
+        toplamUcret.setText("---");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -810,7 +998,7 @@ public class musteriEkle extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(odalar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
@@ -820,7 +1008,7 @@ public class musteriEkle extends javax.swing.JFrame {
                                     .addComponent(jLabel10))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(tc, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                                    .addComponent(tc)
                                     .addComponent(onOdeme, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
                                     .addComponent(baslangicTarih)
                                     .addComponent(telefon)
@@ -828,35 +1016,37 @@ public class musteriEkle extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jLabel11)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGap(85, 85, 85)
                                         .addComponent(secilenOda))
-                                    .addComponent(jRadioButton2))
-                                .addGap(36, 36, 36)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(normalRadio)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(kralRadio)))
+                                .addGap(28, 28, 28)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel12)
+                                    .addComponent(jLabel18))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jLabel18)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(odaUcret)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                                        .addComponent(kisiSayisiCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
                                         .addComponent(iptal))
-                                    .addComponent(jRadioButton1))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(odaUcret)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jLabel13)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(toplamUcret)))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(kaydet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel8)
-                                    .addComponent(jLabel4)
                                     .addComponent(jLabel6))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jLabel16)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(email, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(bitisTarih, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
@@ -867,7 +1057,14 @@ public class musteriEkle extends javax.swing.JFrame {
                                 .addComponent(jLabel1)
                                 .addGap(29, 29, 29)
                                 .addComponent(cinsiyet, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(odaSorgula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(odaSorgula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jRadioButton2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jRadioButton1))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel11)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -908,42 +1105,46 @@ public class musteriEkle extends javax.swing.JFrame {
                             .addComponent(bitisTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel8))
                         .addGap(26, 26, 26)))
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(onOdeme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel16)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(49, 49, 49)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(onOdeme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10))
+                        .addGap(26, 26, 26)
+                        .addComponent(jLabel11)
+                        .addGap(39, 39, 39)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(secilenOda)
+                            .addComponent(jLabel18)
+                            .addComponent(odaUcret)
+                            .addComponent(jLabel13)
+                            .addComponent(toplamUcret))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(iptal)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(normalRadio)
+                                .addComponent(kralRadio)
+                                .addComponent(jLabel12)
+                                .addComponent(kisiSayisiCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jRadioButton2)
                             .addComponent(jRadioButton1))
-                        .addGap(27, 27, 27)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(iptal, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel11)
-                                .addComponent(jLabel18)
-                                .addComponent(secilenOda)
-                                .addComponent(odaUcret)))
-                        .addContainerGap())
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(50, 50, 50)
+                        .addGap(44, 44, 44)
                         .addComponent(odaSorgula)
                         .addGap(18, 18, 18)
-                        .addComponent(kaydet)
-                        .addGap(12, 12, 12)
-                        .addComponent(odalar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(kaydet)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(odalar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -976,7 +1177,7 @@ public class musteriEkle extends javax.swing.JFrame {
 
     private void kaydetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kaydetActionPerformed
        
-           boolean rezervasyonMu=jRadioButton2.isSelected();
+        boolean rezervasyonMu=jRadioButton2.isSelected();
         
         if(rezervasyonMu){
         
@@ -993,18 +1194,39 @@ public class musteriEkle extends javax.swing.JFrame {
     }//GEN-LAST:event_kaydetActionPerformed
 
     private void odaSorgulaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_odaSorgulaActionPerformed
-        // TODO add your handling code here:
-          ilkTarihText=baslangicTarih.getText();
-          ikinciTarihText=bitisTarih.getText();
-          odalar.removeAll();
-          odalar.validate();
-          odalar.repaint();
-          odalariDoldur("musteri_otel_bilgileri");
-          odalariDoldur("rezervasyon");
-          
-          bosOdalariDoldur();
-          odalar.validate();
-          odalar.repaint();
+        try {
+            // TODO add your handling code here:
+            ilkTarihText=baslangicTarih.getText();
+            ikinciTarihText=bitisTarih.getText();
+            
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+            
+            Date date = formatter.parse(ilkTarihText);
+            Date date2 = formatter.parse(ikinciTarihText);
+            
+            odaBilgileriniTemizle();
+            
+            
+            if(date2.getTime()<= date.getTime()){
+               
+                JOptionPane.showMessageDialog(null, "İlk tarih ikinciden büyük veya eşit.");
+                
+            }else{
+                
+                long difference=date2.getTime()- date.getTime();
+                difference=(difference)/(1000*60*60*24);
+                toplamGun=difference;
+                
+
+                bosOdalariDoldur();
+
+                odalar.validate();
+                odalar.repaint();
+            
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         
     }//GEN-LAST:event_odaSorgulaActionPerformed
@@ -1013,6 +1235,10 @@ public class musteriEkle extends javax.swing.JFrame {
         // TODO add your handling code here:
         verileriBosalt();
     }//GEN-LAST:event_iptalActionPerformed
+
+    private void normalRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalRadioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_normalRadioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1054,21 +1280,20 @@ public class musteriEkle extends javax.swing.JFrame {
     private javax.swing.JTextField baslangicTarih;
     private javax.swing.JTextField bitisTarih;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JComboBox<String> cinsiyet;
     private javax.swing.JTextField email;
     private javax.swing.JButton iptal;
     private javax.swing.JTextField isim;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -1078,6 +1303,9 @@ public class musteriEkle extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JButton kaydet;
+    private javax.swing.JComboBox<String> kisiSayisiCombo;
+    private javax.swing.JRadioButton kralRadio;
+    private javax.swing.JRadioButton normalRadio;
     private javax.swing.JButton odaSorgula;
     private javax.swing.JLabel odaUcret;
     private javax.swing.JPanel odalar;
@@ -1086,21 +1314,22 @@ public class musteriEkle extends javax.swing.JFrame {
     private javax.swing.JTextField soyisim;
     private javax.swing.JTextField tc;
     private javax.swing.JTextField telefon;
+    private javax.swing.JLabel toplamUcret;
     // End of variables declaration//GEN-END:variables
 
+    private void odaBilgileriniTemizle() {
     
-
-
-  
-
+    odalar.removeAll();
+            odalar.validate();
+            odalar.repaint();
+            secilenOda.setText("---");
+            odaUcret.setText("---");
+            onOdeme.setText("");
+            toplamUcret.setText("---");
     
+    }
 
-   
-
-   
-
-    
-    
+      
 
     
 
