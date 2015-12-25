@@ -5,6 +5,9 @@
  */
 package otelrezervasyon;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
+import static otelrezervasyon.dbConnection.con;
 
 /**
  *
@@ -71,6 +75,14 @@ public class musteriIslemleri extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         musteriTablo = new javax.swing.JTable();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -163,17 +175,69 @@ public class musteriIslemleri extends javax.swing.JPanel {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Müşteri Listesi"));
 
+        musteriTablo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                musteriTabloMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(musteriTablo);
+
+        jLabel5.setText("Ad");
+
+        jLabel6.setText("Soyad");
+
+        jLabel7.setText("E-mail");
+
+        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField4ActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setText("Telefon");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(jLabel5)
+                .addGap(82, 82, 82)
+                .addComponent(jLabel6)
+                .addGap(69, 69, 69)
+                .addComponent(jLabel7)
+                .addGap(68, 68, 68)
+                .addComponent(jLabel8)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8))
+                .addGap(7, 7, 7)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Diğer"));
@@ -350,6 +414,57 @@ public class musteriIslemleri extends javax.swing.JPanel {
         musteriTablo.setModel(tb);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void musteriTabloMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_musteriTabloMouseClicked
+        // TODO add your handling code here:
+        /*
+         try {
+            db.dbBaglan();
+            String musteriler = sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
+                + "konak_sayisi FROM musteri,musteri_otel_bilgileri WHERE musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
+            PreparedStatement ps = con.prepareStatement(musteriler, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+            ps.executeQuery();
+            ps.getResultSet().absolute(musteriTablo.getSelectedRow()+1);
+            jTextFieldIsim.setText(ps.getResultSet().getString("AD"));
+            jTextFieldSoyAd.setText(ps.getResultSet().getString("SOYAD"));
+            jTextFieldTc.setText(ps.getResultSet().getString("TC"));
+            jTextFieldSgkNo.setText(ps.getResultSet().getString("SGK_NO"));
+            jTextFieldIzinHakki.setText(ps.getResultSet().getString("KALAN_IZIN_HAKKI"));
+            jTextFieldTelefon.setText(ps.getResultSet().getString("TELEFON"));
+            jTextFieldPosta.setText(ps.getResultSet().getString("EPOSTA"));
+            gorevId = ps.getResultSet().getString("GOREV_ID");
+            personelId=ps.getResultSet().getInt("ID");
+            if(ps.getResultSet().getString("CINSIYET").equals("Kadın")){
+                jComboBoxCinsiyet.setSelectedIndex(0);
+            }
+            else{
+                jComboBoxCinsiyet.setSelectedIndex(1);
+            }
+            try {
+               
+                String sql = " Select GOREV_ADI From GOREV Where GOREV_ID="+gorevId;
+                PreparedStatement psg = con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY);
+                psg.executeQuery();
+                psg.getResultSet().beforeFirst();
+                psg.getResultSet().next();
+                    jComboBoxGorev.setSelectedItem(psg.getResultSet().getString("GOREV_ADI"));
+                
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        jButtonGuncelle.setEnabled(true);*/
+    }//GEN-LAST:event_musteriTabloMouseClicked
+
+    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField4ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -361,10 +476,18 @@ public class musteriIslemleri extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
     private javax.swing.JTable musteriTablo;
     private javax.swing.JTextField odaNo;
     private javax.swing.JTextField tarihIki;

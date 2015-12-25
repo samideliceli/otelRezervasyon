@@ -54,6 +54,8 @@ public class musteriEkle extends javax.swing.JFrame {
     private boolean odaSecildi=false;
     private boolean eskiMusteri,rezVar=false;
     private boolean  kralOdaSecildi=false;
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+    
     private long toplamGun;
     
     
@@ -68,11 +70,13 @@ public class musteriEkle extends javax.swing.JFrame {
         db=new dbConnection();
         db.dbBaglan();
         
-        buttonGroup1.add(jRadioButton1);
+        buttonGroup1.add(musteriRadio);
         buttonGroup1.add(jRadioButton2);
         
         buttonGroup2.add(normalRadio);
         buttonGroup2.add(kralRadio);
+        
+        
       
         kralRadio.addItemListener(new ItemListener() {
             @Override
@@ -108,6 +112,33 @@ public class musteriEkle extends javax.swing.JFrame {
                 }
             
             
+            
+            }
+        });
+        
+        
+         musteriRadio.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent ıe) {
+            
+            Date gununTarihi = new Date();
+           
+            String bugun=formatter.format(gununTarihi.getTime());
+            baslangicTarih.setText(bugun);
+            baslangicTarih.setEnabled(false);
+                
+                
+                
+            }
+           
+        });
+        
+         jRadioButton2.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent ıe) {
+            
+                baslangicTarih.setText("");
+                baslangicTarih.setEnabled(true);
             
             }
         });
@@ -486,7 +517,7 @@ public class musteriEkle extends javax.swing.JFrame {
         
         onOdemeText=onOdeme.getText();
         java.sql.Date sqldate = null,sqldate2 = null;
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+       
          
        
         try {
@@ -577,10 +608,13 @@ public class musteriEkle extends javax.swing.JFrame {
                 + "EMAIL,BASLANGIC_TARIHI,BITIS_TARIHI,ODEME_TUTARI,ODA_NO) "
                 + "VALUES (?,?,?,?,?,?,?,?,?,?)";
         
+        String sql3 = ("INSERT INTO GELIR (GELIR_TURU,TARIH,GELIR) VALUES (?,?,?)");
+        
+        
         String cinsiyet;
         onOdemeText=onOdeme.getText();
         
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+       
         
         if(this.cinsiyet.getSelectedIndex()==0){
             cinsiyet="e";
@@ -614,6 +648,16 @@ public class musteriEkle extends javax.swing.JFrame {
             ps.setInt(10, secilenOdaText);
             ps.executeUpdate();
             
+            
+            Date gununTarihi = new Date();
+            sqldate = new java.sql.Date(gununTarihi.getTime());
+            
+            PreparedStatement ps2 =dbConnection.getCon().prepareStatement(sql3);
+            ps2.setString(1, "Ön ödeme");
+            ps2.setDate(2, sqldate);
+            ps2.setInt(3, Integer.valueOf(onOdemeText));
+            ps2.executeUpdate();
+            
             dbConnection.getCon().close();
             
             
@@ -631,8 +675,7 @@ public class musteriEkle extends javax.swing.JFrame {
     
     private boolean odaBosmu(int odaNo, String tablo) { 
         
-        st=dbConnection.getSt();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");  
+        st=dbConnection.getSt(); 
         ResultSet rs3 = null;
         
         java.sql.Date sqldate2=null,sqldate=null;
@@ -848,7 +891,7 @@ public class musteriEkle extends javax.swing.JFrame {
         cinsiyet = new javax.swing.JComboBox<>();
         baslangicTarih = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        musteriRadio = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
         bitisTarih = new javax.swing.JTextField();
         onOdeme = new javax.swing.JTextField();
@@ -907,7 +950,7 @@ public class musteriEkle extends javax.swing.JFrame {
 
         jLabel8.setText("Bitiş");
 
-        jRadioButton1.setText("Müşteri");
+        musteriRadio.setText("Müşteri");
 
         jRadioButton2.setSelected(true);
         jRadioButton2.setText("Rezervasyon");
@@ -1016,7 +1059,8 @@ public class musteriEkle extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addGap(85, 85, 85)
+                                        .addComponent(jLabel11)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(secilenOda))
                                     .addGroup(jPanel3Layout.createSequentialGroup()
                                         .addComponent(normalRadio)
@@ -1061,10 +1105,7 @@ public class musteriEkle extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jRadioButton2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jRadioButton1))))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel11)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(musteriRadio)))))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -1095,11 +1136,9 @@ public class musteriEkle extends javax.swing.JFrame {
                         .addComponent(jLabel15)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(baslangicTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7))
-                        .addGap(18, 18, 18))
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(baslangicTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel7))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(bitisTarih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1110,15 +1149,14 @@ public class musteriEkle extends javax.swing.JFrame {
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(onOdeme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel10))
-                        .addGap(26, 26, 26)
-                        .addComponent(jLabel11)
-                        .addGap(39, 39, 39)
+                        .addGap(86, 86, 86)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(secilenOda)
                             .addComponent(jLabel18)
                             .addComponent(odaUcret)
                             .addComponent(jLabel13)
-                            .addComponent(toplamUcret))
+                            .addComponent(toplamUcret)
+                            .addComponent(jLabel11))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(iptal)
@@ -1131,7 +1169,7 @@ public class musteriEkle extends javax.swing.JFrame {
                         .addGap(14, 14, 14)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jRadioButton2)
-                            .addComponent(jRadioButton1))
+                            .addComponent(musteriRadio))
                         .addGap(44, 44, 44)
                         .addComponent(odaSorgula)
                         .addGap(18, 18, 18)
@@ -1199,22 +1237,29 @@ public class musteriEkle extends javax.swing.JFrame {
             ilkTarihText=baslangicTarih.getText();
             ikinciTarihText=bitisTarih.getText();
             
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+           
             
             Date date = formatter.parse(ilkTarihText);
             Date date2 = formatter.parse(ikinciTarihText);
             
             odaBilgileriniTemizle();
+            Date gununTarihi=new Date();
+            String bugun=formatter.format(gununTarihi.getTime());
+            Date date3 = formatter.parse(bugun);
             
-            
-            if(date2.getTime()<= date.getTime()){
+            if(date2.getTime()< date.getTime()){
                
-                JOptionPane.showMessageDialog(null, "İlk tarih ikinciden büyük veya eşit.");
+                JOptionPane.showMessageDialog(null, "İlk tarih ikinciden büyük.");
                 
-            }else{
+            }
+            else if(date.getTime()<date3.getTime()){
+            
+                JOptionPane.showMessageDialog(null, "Bugünden daha önceye kayit yapılamaz.");
+            }
+            else{
                 
                 long difference=date2.getTime()- date.getTime();
-                difference=(difference)/(1000*60*60*24);
+                difference=((difference)/(1000*60*60*24))+1;
                 toplamGun=difference;
                 
 
@@ -1300,11 +1345,11 @@ public class musteriEkle extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JButton kaydet;
     private javax.swing.JComboBox<String> kisiSayisiCombo;
     private javax.swing.JRadioButton kralRadio;
+    private javax.swing.JRadioButton musteriRadio;
     private javax.swing.JRadioButton normalRadio;
     private javax.swing.JButton odaSorgula;
     private javax.swing.JLabel odaUcret;
