@@ -16,6 +16,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import static otelrezervasyon.dbConnection.con;
 import static otelrezervasyon.dbConnection.st;
@@ -53,6 +54,8 @@ public class muhasebe extends javax.swing.JPanel {
         giderEkle.setEnabled(false);
         gelirListele.setEnabled(false);
         giderListele.setEnabled(false);
+        gelirSifirla.setEnabled(false);
+        giderSifirla.setEnabled(false);
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         gelirilkTarih.setFormats(dateFormat);
         gelirikinciTarih.setFormats(dateFormat);
@@ -96,12 +99,39 @@ public class muhasebe extends javax.swing.JPanel {
                 }
             }
         };
+        ActionListener acl3 = new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (gelirilkTarih.getDate() == null && gelirilkTarih.getDate() == null) {
+                    gelirSifirla.setEnabled(false);
+                } else {
+                    gelirSifirla.setEnabled(true);
+                }
+            }
+        };
+
+        ActionListener acl4 = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (giderilkTarih.getDate() == null && giderikinciTarih.getDate() == null) {
+                    giderSifirla.setEnabled(false);
+                } else {
+                    giderSifirla.setEnabled(true);
+                }
+            }
+        };
         gelirilkTarih.addActionListener(acl);
         gelirikinciTarih.addActionListener(acl);
+        gelirilkTarih.addActionListener(acl3);
+        gelirikinciTarih.addActionListener(acl3);
 
-        giderListele.addActionListener(acl2);
+        giderilkTarih.addActionListener(acl3);
         giderikinciTarih.addActionListener(acl2);
+        giderilkTarih.addActionListener(acl4);
+        giderikinciTarih.addActionListener(acl4);
+
         giderTutar.addKeyListener(adapter);
         gelirTutar.addKeyListener(adapter);
         tbGelir = new DefaultTableModel() {
@@ -127,6 +157,15 @@ public class muhasebe extends javax.swing.JPanel {
         gelirTablosu.setModel(tbGelir);
         t.tabloyuOlustur(sql2, gider, tbGider);
         giderTablosu.setModel(tbGider);
+    }
+
+    public boolean sayiMi(Object input) {
+        try {
+            Integer.parseInt(input.toString());
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     public void turleriCek() {
@@ -491,7 +530,7 @@ public class muhasebe extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(19, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -653,9 +692,8 @@ public class muhasebe extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(7, 7, 7)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -671,7 +709,7 @@ public class muhasebe extends javax.swing.JPanel {
 
     private void gelirEkleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gelirEkleActionPerformed
         Object tur = gelirTur.getSelectedItem();
-        Object tutar = gelirTutar.getText();
+        String tutar = gelirTutar.getText();
         db.dbBaglan();
         String sql3 = ("INSERT INTO GELIR (GELIR_TURU,TARIH,GELIR) VALUES (?,?,?)");
         try {
@@ -679,7 +717,11 @@ public class muhasebe extends javax.swing.JPanel {
             ps.setObject(1, tur);
             ps.setObject(2, Calendar.getInstance());
             ps.setObject(3, tutar);
-            ps.executeUpdate();
+            if (sayiMi(tutar)) {
+                ps.executeUpdate();
+            } else {
+                JOptionPane.showMessageDialog(null, "Lütfen Sayısal Bir Değer Giriniz!");
+            }
             con.close();
         } catch (SQLException ex) {
             Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
@@ -785,6 +827,7 @@ public class muhasebe extends javax.swing.JPanel {
         gelirilkTarih.setDate(null);
         gelirikinciTarih.setDate(null);
         gelirListele.setEnabled(false);
+        gelirSifirla.setEnabled(false);
     }//GEN-LAST:event_gelirSifirlaActionPerformed
 
     private void giderListeleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_giderListeleActionPerformed
@@ -819,6 +862,7 @@ public class muhasebe extends javax.swing.JPanel {
         giderilkTarih.setDate(null);
         giderikinciTarih.setDate(null);
         giderListele.setEnabled(false);
+        giderSifirla.setEnabled(false);
     }//GEN-LAST:event_giderSifirlaActionPerformed
 
 

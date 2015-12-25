@@ -10,16 +10,16 @@ import static otelrezervasyon.dbConnection.con;
 import static otelrezervasyon.dbConnection.st;
 
 public class tableModel extends DefaultTableModel {
-    
+
     private int sutunSayisi, satirSayisi, i, satir, sutun;
     private Object[] row;
     private dbConnection db;
     ResultSet rs;
-    
+
     public tableModel() {
         db = new dbConnection();
     }
-    
+
     public void tabloyuOlustur(String sql, Vector v, DefaultTableModel tb) {
         try {
             tb.setRowCount(0);
@@ -44,7 +44,7 @@ public class tableModel extends DefaultTableModel {
         } catch (SQLException ex) {
             Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
 }
