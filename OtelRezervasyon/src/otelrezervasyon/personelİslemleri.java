@@ -18,7 +18,9 @@ import java.util.GregorianCalendar;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import static otelrezervasyon.dbConnection.con;
 
@@ -29,6 +31,8 @@ import static otelrezervasyon.dbConnection.con;
 public class personelİslemleri extends javax.swing.JPanel {
 
     private String tc,isim,soyIsim,sgkNo,gorev,telefon,eposta,cinsiyet,izinHakki;
+    private String gorevId;
+    private Integer personelId ;
     private final KeyAdapter adapter;
     dbConnection baglan;
     textKontrolleri txtkontrol;
@@ -108,7 +112,7 @@ public class personelİslemleri extends javax.swing.JPanel {
     private void tabloyuDoldur(){
     
         t = new tableModel();
-        sql = " Select p.AD,p.SOYAD,p.TC,g.GOREV_ADI,p.ISE_BASLAMA_TARIHI,p.BITIS_TARIHI,p.CINSIYET,p.SGK_NO,DURUM,p.CIKIS_NEDENI,p.KALAN_IZIN_HAKKı From PERSONEL as p,GOREV as g Where g.GOREV_Id=p.GOREV_ID";
+        sql = " Select p.AD,p.SOYAD,p.TC,g.GOREV_ADI,p.ISE_BASLAMA_TARIHI,p.BITIS_TARIHI,p.CINSIYET,p.SGK_NO,DURUM,p.CIKIS_NEDENI,p.KALAN_IZIN_HAKKI,p.TELEFON,p.EPOSTA From PERSONEL as p,GOREV as g Where g.GOREV_Id=p.GOREV_ID";
         
         tb = new DefaultTableModel() {
             @Override
@@ -163,6 +167,14 @@ public class personelİslemleri extends javax.swing.JPanel {
             Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    private void uyariDialog(String baslik,String mesaj){
+        JOptionPane op = new JOptionPane(mesaj,JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = op.createDialog(baslik);
+        dialog.setAlwaysOnTop(true); //<-- this line
+        dialog.setModal(true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+    }
     
 
     /**
@@ -181,7 +193,7 @@ public class personelİslemleri extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTablePersonel = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        jButtonGuncelle = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -265,9 +277,19 @@ public class personelİslemleri extends javax.swing.JPanel {
             }
         ));
         jTablePersonel.setAutoscrolls(false);
+        jTablePersonel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTablePersonelMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTablePersonel);
 
-        jButton1.setText("Güncelle");
+        jButtonGuncelle.setText("Güncelle");
+        jButtonGuncelle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonGuncelleActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Sil");
 
@@ -281,7 +303,7 @@ public class personelİslemleri extends javax.swing.JPanel {
                 .addContainerGap())
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(323, 323, 323)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonGuncelle, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(39, 39, 39)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -292,7 +314,7 @@ public class personelİslemleri extends javax.swing.JPanel {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(jButtonGuncelle)
                     .addComponent(jButton2))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -494,7 +516,7 @@ public class personelİslemleri extends javax.swing.JPanel {
         baglan.dbBaglan();
          try {
             
-            String sql = "INSERT INTO PERSONEL (AD,SOYAD,TC,SGK_NO,GOREV_ID,ISE_BASLAMA_TARIHI,CINSIYET,DURUM,KALAN_IZIN_HAKKI) VALUES (?,?,?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO PERSONEL (AD,SOYAD,TC,SGK_NO,GOREV_ID,ISE_BASLAMA_TARIHI,CINSIYET,DURUM,KALAN_IZIN_HAKKI,TELEFON,EPOSTA) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, isim);
             ps.setString(2, soyIsim);
@@ -505,6 +527,8 @@ public class personelİslemleri extends javax.swing.JPanel {
             ps.setString(7, cinsiyet);
             ps.setBoolean(8, true);
             ps.setInt(9,Integer.parseInt(jTextFieldIzinHakki.getText()));
+            ps.setString(10, jTextFieldTelefon.getText());
+            ps.setString(11, jTextFieldPosta.getText());
             ps.executeUpdate();
             con.close();
         } catch (SQLException ex) {
@@ -532,7 +556,6 @@ public class personelİslemleri extends javax.swing.JPanel {
         frame.addWindowListener(new java.awt.event.WindowAdapter() { 
             @Override 
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-        
                 jComboBoxGorev.removeAllItems();
                 gorevCBEkle();
             } 
@@ -541,10 +564,106 @@ public class personelİslemleri extends javax.swing.JPanel {
         gorevCBEkle();
     }//GEN-LAST:event_jButtonGörevEkleActionPerformed
 
+    private void jButtonGuncelleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuncelleActionPerformed
+        baglan.dbBaglan();
+         if(jComboBoxCinsiyet.getSelectedIndex() == 1){
+            cinsiyet = "Erkek";
+        }
+        else{
+            cinsiyet = "Kadın";
+        }
+        String sql = ("UPDATE PERSONEL SET AD=(?),SOYAD=(?),TC=(?),SGK_NO=(?),CINSIYET=(?),KALAN_IZIN_HAKKI=(?),TELEFON=(?),EPOSTA=(?),GOREV_ID=(?) WHERE ID="+personelId);
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);          
+            ps.setString(1, jTextFieldIsim.getText());
+            ps.setString(2, jTextFieldSoyAd.getText());
+            ps.setString(3, jTextFieldTc.getText());           
+            ps.setString(4, jTextFieldSgkNo.getText());
+            ps.setString(5, cinsiyet);
+            ps.setInt(6,Integer.parseInt(jTextFieldIzinHakki.getText()));
+            ps.setString(7, jTextFieldTelefon.getText());
+            ps.setString(8, jTextFieldPosta.getText());
+         
+            try {
+               
+                String sqlGorev = " Select GOREV_ID From GOREV Where GOREV_ADI='"+jComboBoxGorev.getSelectedItem().toString()+"'";
+                PreparedStatement psg = con.prepareStatement(sqlGorev, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY);
+                
+                psg.executeQuery();
+                psg.getResultSet().beforeFirst();
+                psg.getResultSet().next();
+                ps.setInt(9, psg.getResultSet().getInt("GOREV_ID"));
+                
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (ps.executeUpdate() != 0) {
+                uyariDialog("Mesaj","Veri Başarıyla Güncellendi!");
+                
+            } else {
+                uyariDialog("Mesaj","Hata Oluştu!");
+            }
+       
+            jButtonGuncelle.setEnabled(false);
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(gorevEkle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+     
+        jTablePersonel.removeAll();
+        tabloyuDoldur();
+    }//GEN-LAST:event_jButtonGuncelleActionPerformed
+
+    private void jTablePersonelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTablePersonelMouseClicked
+        try {
+            baglan.dbBaglan();
+            String gorevSql = " Select * From PERSONEL ";
+            PreparedStatement ps = con.prepareStatement(gorevSql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+            ps.executeQuery();
+            ps.getResultSet().absolute(jTablePersonel.getSelectedRow()+1);
+            jTextFieldIsim.setText(ps.getResultSet().getString("AD"));
+            jTextFieldSoyAd.setText(ps.getResultSet().getString("SOYAD"));
+            jTextFieldTc.setText(ps.getResultSet().getString("TC"));
+            jTextFieldSgkNo.setText(ps.getResultSet().getString("SGK_NO"));
+            jTextFieldIzinHakki.setText(ps.getResultSet().getString("KALAN_IZIN_HAKKI"));
+            jTextFieldTelefon.setText(ps.getResultSet().getString("TELEFON"));
+            jTextFieldPosta.setText(ps.getResultSet().getString("EPOSTA"));
+            gorevId = ps.getResultSet().getString("GOREV_ID");
+            personelId=ps.getResultSet().getInt("ID");
+            if(ps.getResultSet().getString("CINSIYET").equals("Kadın")){
+                jComboBoxCinsiyet.setSelectedIndex(0);
+            }
+            else{
+                jComboBoxCinsiyet.setSelectedIndex(1);
+            }
+            try {
+               
+                String sql = " Select GOREV_ADI From GOREV Where GOREV_ID="+gorevId;
+                PreparedStatement psg = con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY);
+                psg.executeQuery();
+                psg.getResultSet().beforeFirst();
+                psg.getResultSet().next();
+                    jComboBoxGorev.setSelectedItem(psg.getResultSet().getString("GOREV_ADI"));
+                
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        jButtonGuncelle.setEnabled(true);
+    }//GEN-LAST:event_jTablePersonelMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButtonGuncelle;
     private javax.swing.JButton jButtonGörevEkle;
     private javax.swing.JButton jButtonPersonelAra;
     private javax.swing.JButton jButtonPersonelKaydet;

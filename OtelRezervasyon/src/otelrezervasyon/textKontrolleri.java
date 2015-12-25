@@ -5,9 +5,14 @@
  */
 package otelrezervasyon;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -102,7 +107,36 @@ public class textKontrolleri {
      
       public boolean telefonKontrol(String telefonText) {
       
-      return telefonText.matches(telefonPattern);
+       dbConnection db=new dbConnection();
+       db.dbBaglan();
+       
+       boolean varMi=true;
+       
+       ResultSet rs=null;
+       
+       Statement st=dbConnection.getSt();
+        try {  
+            rs=st.executeQuery("SELECT telefon FROM musteri WHERE telefon='"+telefonText+"'");
+            
+            int i=0; 
+            while(rs.next())
+            {
+                i++;
+                
+                varMi=false;
+
+            }
+            
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(textKontrolleri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+           
+        
+          
+      return telefonText.matches(telefonPattern) && varMi;
         
     }
     public static boolean sayiKontrol(String sayiText){
