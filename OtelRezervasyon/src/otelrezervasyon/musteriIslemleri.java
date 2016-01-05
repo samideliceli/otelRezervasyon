@@ -5,6 +5,7 @@
  */
 package otelrezervasyon;
 
+import java.awt.Color;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import static otelrezervasyon.dbConnection.con;
 
@@ -29,6 +31,8 @@ public class musteriIslemleri extends javax.swing.JPanel {
     private final DefaultTableModel tb;
     private final dbConnection db;
     private Vector veri;
+    String ilkTelefon;
+    int musteriID;
     /**
      * Creates new form musteriIslemleri
      */
@@ -36,7 +40,7 @@ public class musteriIslemleri extends javax.swing.JPanel {
         initComponents();
         db = new dbConnection();
         t = new tableModel();
-        sql = " Select ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
+        sql = " Select ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,toplam_oda_ucret,baslangic_tarihi,bitis_tarihi,"
                 + "konak_sayisi from musteri,musteri_otel_bilgileri Where musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
         
         tb = new DefaultTableModel() {
@@ -75,14 +79,17 @@ public class musteriIslemleri extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         musteriTablo = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
+        musteriAd = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        musteriSoyad = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        musteriTelefon = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
+        musteriMail = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
+        guncelle = new javax.swing.JButton();
+        onOdeme = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -174,6 +181,7 @@ public class musteriIslemleri extends javax.swing.JPanel {
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Müşteri Listesi"));
+        jPanel2.setPreferredSize(new java.awt.Dimension(674, 416));
 
         musteriTablo.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -188,13 +196,23 @@ public class musteriIslemleri extends javax.swing.JPanel {
 
         jLabel7.setText("E-mail");
 
-        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+        musteriMail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField4ActionPerformed(evt);
+                musteriMailActionPerformed(evt);
             }
         });
 
         jLabel8.setText("Telefon");
+
+        guncelle.setText("Güncelle");
+        guncelle.setEnabled(false);
+        guncelle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guncelleActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setText("Ön Ödeme");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -202,41 +220,50 @@ public class musteriIslemleri extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(musteriAd, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(musteriSoyad, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(musteriMail, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(musteriTelefon, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(onOdeme, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(guncelle)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(33, 33, 33)
                 .addComponent(jLabel5)
                 .addGap(82, 82, 82)
                 .addComponent(jLabel6)
-                .addGap(69, 69, 69)
+                .addGap(87, 87, 87)
                 .addComponent(jLabel7)
-                .addGap(68, 68, 68)
+                .addGap(77, 77, 77)
                 .addComponent(jLabel8)
+                .addGap(78, 78, 78)
+                .addComponent(jLabel9)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(jLabel6)
                     .addComponent(jLabel7)
-                    .addComponent(jLabel8))
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel9))
                 .addGap(7, 7, 7)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(musteriAd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(musteriSoyad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(musteriTelefon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(musteriMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(guncelle)
+                    .addComponent(onOdeme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -286,25 +313,25 @@ public class musteriIslemleri extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1205, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(6, 6, 6))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -350,13 +377,13 @@ public class musteriIslemleri extends javax.swing.JPanel {
       boolean tarihVar = false;
       int seciliIndex=jComboBox1.getSelectedIndex();
       if(seciliIndex==0){
-             sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
+             sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,toplam_oda_ucret,baslangic_tarihi,bitis_tarihi,"
                 + "konak_sayisi FROM musteri,musteri_otel_bilgileri WHERE musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
         
       }
         
       else{
-           sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,odeme_tutari,baslangic_tarihi,bitis_tarihi"
+           sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,odeme_tutari,toplam_oda_ucret,baslangic_tarihi,bitis_tarihi"
                    + " FROM rezervasyon";
         
       }
@@ -415,58 +442,131 @@ public class musteriIslemleri extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void musteriTabloMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_musteriTabloMouseClicked
-        // TODO add your handling code here:
-        /*
-         try {
+       
+        
+        try {
             db.dbBaglan();
-            String musteriler = sql = " SELECT ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
-                + "konak_sayisi FROM musteri,musteri_otel_bilgileri WHERE musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
-            PreparedStatement ps = con.prepareStatement(musteriler, ResultSet.TYPE_SCROLL_INSENSITIVE,
+            String sql2=" SELECT musteri.musteri_id,ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
+                    + "konak_sayisi FROM musteri,musteri_otel_bilgileri WHERE musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
+            PreparedStatement ps = con.prepareStatement(sql2, ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
             ps.executeQuery();
+            
+           
             ps.getResultSet().absolute(musteriTablo.getSelectedRow()+1);
-            jTextFieldIsim.setText(ps.getResultSet().getString("AD"));
-            jTextFieldSoyAd.setText(ps.getResultSet().getString("SOYAD"));
-            jTextFieldTc.setText(ps.getResultSet().getString("TC"));
-            jTextFieldSgkNo.setText(ps.getResultSet().getString("SGK_NO"));
-            jTextFieldIzinHakki.setText(ps.getResultSet().getString("KALAN_IZIN_HAKKI"));
-            jTextFieldTelefon.setText(ps.getResultSet().getString("TELEFON"));
-            jTextFieldPosta.setText(ps.getResultSet().getString("EPOSTA"));
-            gorevId = ps.getResultSet().getString("GOREV_ID");
-            personelId=ps.getResultSet().getInt("ID");
-            if(ps.getResultSet().getString("CINSIYET").equals("Kadın")){
-                jComboBoxCinsiyet.setSelectedIndex(0);
-            }
-            else{
-                jComboBoxCinsiyet.setSelectedIndex(1);
-            }
-            try {
-               
-                String sql = " Select GOREV_ADI From GOREV Where GOREV_ID="+gorevId;
-                PreparedStatement psg = con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY);
-                psg.executeQuery();
-                psg.getResultSet().beforeFirst();
-                psg.getResultSet().next();
-                    jComboBoxGorev.setSelectedItem(psg.getResultSet().getString("GOREV_ADI"));
-                
-                
-            } catch (SQLException ex) {
-                Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            con.close();
+             ilkTelefon=ps.getResultSet().getString("TELEFON");
+            musteriAd.setText(ps.getResultSet().getString("AD"));
+            musteriSoyad.setText(ps.getResultSet().getString("SOYAD"));
+            musteriMail.setText(ps.getResultSet().getString("EMAIL"));
+            musteriTelefon.setText(ps.getResultSet().getString("TELEFON"));
+            onOdeme.setText(ps.getResultSet().getString("on_odeme_tutar"));
+            musteriID=ps.getResultSet().getInt("Musteri_id");
+            
+            guncelle.setEnabled(true);
         } catch (SQLException ex) {
-            Logger.getLogger(personelİslemleri.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(musteriIslemleri.class.getName()).log(Level.SEVERE, null, ex);
         }
-        jButtonGuncelle.setEnabled(true);*/
     }//GEN-LAST:event_musteriTabloMouseClicked
 
-    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+    private void musteriMailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_musteriMailActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField4ActionPerformed
+    }//GEN-LAST:event_musteriMailActionPerformed
+
+    private void guncelleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guncelleActionPerformed
+        // TODO add your handling code here:
+        
+        String musteriAdText=musteriAd.getText();
+        String musteriSoyadText=musteriSoyad.getText();
+        String emailText=musteriMail.getText();
+        String onOdemeText=onOdeme.getText();
+        String musteriTel=musteriTelefon.getText();
+        
+        
+        boolean ad,soyad,telefon,email,onOdemeK;
+        
+        textKontrolleri kontrol=new textKontrolleri();
+        
+        Color gri=new Color(237,237,237);
+        Color kirmizi=new Color(215,134,130);
+        
+        if(kontrol.adSoyadKontrol(musteriAdText, "aaa")){
+             musteriAd.setBackground(gri);
+             ad=true;
+        }
+        else{
+            musteriAd.setBackground(kirmizi);
+            ad=false;
+        }
+        
+        if(kontrol.adSoyadKontrol(musteriSoyadText, "aaa")){
+             musteriSoyad.setBackground(gri);
+             soyad=true;
+        }
+        else{
+            musteriSoyad.setBackground(kirmizi);
+            soyad=false;
+        }
+        
+        
+        if(kontrol.emailKontrol(emailText)){
+         musteriMail.setBackground(gri);
+         email=true;
+        }
+        else{
+            musteriMail.setBackground(kirmizi);
+            email=false;
+        }
+        
+        
+        if(kontrol.onOdemeKontrol(onOdemeText)){
+         onOdeme.setBackground(gri);
+         onOdemeK=true;
+        } 
+        else{
+            onOdeme.setBackground(kirmizi);
+            onOdemeK=false;
+        }
+        
+        
+        if(!ilkTelefon.equals(musteriTel)){
+                if(kontrol.telefonKontrol(musteriTel)){
+                 musteriTelefon.setBackground(gri);
+                 telefon=true;
+                }
+        
+                else{
+                    musteriTelefon.setBackground(kirmizi);
+                    telefon=false;
+                }
+          }
+        else{
+         musteriTelefon.setBackground(gri);
+         telefon=true;
+        }
+        
+        
+        if(ad && soyad && telefon && email && onOdemeK){
+            try {
+                PreparedStatement ps;
+                
+                String sql2="UPDATE  musteri SET ad='"+musteriAdText+"', soyad='"+musteriSoyadText+
+                "', telefon WHERE musteri_id="+musteriID;
+                
+                ps =dbConnection.getCon().prepareStatement(sql2);
+               
+                ps.execute();
+            } catch (SQLException ex) {
+                Logger.getLogger(musteriIslemleri.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+        }
+        
+    }//GEN-LAST:event_guncelleActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton guncelle;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -480,16 +580,18 @@ public class musteriIslemleri extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JTextField musteriAd;
+    private javax.swing.JTextField musteriMail;
+    private javax.swing.JTextField musteriSoyad;
     private javax.swing.JTable musteriTablo;
+    private javax.swing.JTextField musteriTelefon;
     private javax.swing.JTextField odaNo;
+    private javax.swing.JTextField onOdeme;
     private javax.swing.JTextField tarihIki;
     private javax.swing.JTextField tarihIlk;
     // End of variables declaration//GEN-END:variables
