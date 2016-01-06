@@ -5,45 +5,47 @@
  */
 package otelrezervasyon;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
 
 /**
  *
  * @author delilog
  */
 public class programArayuz extends javax.swing.JFrame {
-
-    musteriIslemleri musteri = new musteriIslemleri();
-    odaIslemleri oda = new odaIslemleri();
-    muhasebe muhasebe = new muhasebe();
-    hizmetler hizmet = new hizmetler();
-    personelİslemleri personel = new personelİslemleri();
-    demirbaslar demirbas = new demirbaslar();
-
     /**
      * Creates new form programArayuz
      */
+    JButton eskitab=null;
+    private dbConnection db;
     public programArayuz() {
 
         initComponents();
-
-        personelButon.setIcon(new javax.swing.ImageIcon("src/images/otel.png"));
+        musteriIslemleri m=new musteriIslemleri();
+        updateGUI(m,musteriTab);
+        db=new dbConnection();
+        otelBilgileriniGuncelle();
+        
+        
+        otelButon.setIcon(new javax.swing.ImageIcon("src/images/otel.png"));
         firsatButon.setIcon(new javax.swing.ImageIcon("src/images/advantage.png"));
         jButton2.setIcon(new javax.swing.ImageIcon("src/images/notification.png"));
         otel_logo.setIcon(new javax.swing.ImageIcon("src/images/hotelLogo.png"));
-        jLabel2.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
-        jLabel3.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
-        jLabel4.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
-
-        tabbedPane.add("Müşteri", musteri);
-        tabbedPane.add("Oda", oda);
-        tabbedPane.add("Muhasebe", muhasebe);
-        tabbedPane.add("Personel", personel);
-        tabbedPane.add("Hizmetler", hizmet);
-        tabbedPane.add("Demirbaş", demirbas);
+        musteriTab.setIcon(new javax.swing.ImageIcon("src/images/customers.png"));
+        roomTab.setIcon(new javax.swing.ImageIcon("src/images/room.png"));
+        muhasebeTab.setIcon(new javax.swing.ImageIcon("src/images/muhasebe.png"));
+        personelTab.setIcon(new javax.swing.ImageIcon("src/images/personel.png"));
+        servisTab.setIcon(new javax.swing.ImageIcon("src/images/servis.png"));
+        demirbasTab.setIcon(new javax.swing.ImageIcon("src/images/demirbas.png"));
+        
 
     }
 
@@ -56,15 +58,20 @@ public class programArayuz extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        tabbedPane = new javax.swing.JTabbedPane();
-        personelButon = new javax.swing.JButton();
+        otelButon = new javax.swing.JButton();
         firsatButon = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         otel_logo = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        musteriTab = new javax.swing.JButton();
+        muhasebeTab = new javax.swing.JButton();
+        roomTab = new javax.swing.JButton();
+        personelTab = new javax.swing.JButton();
+        servisTab = new javax.swing.JButton();
+        demirbasTab = new javax.swing.JButton();
+        content = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        yildizlar = new javax.swing.JPanel();
+        OtelIsim = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("GRAYLIGHT");
@@ -72,14 +79,9 @@ public class programArayuz extends javax.swing.JFrame {
         setForeground(java.awt.Color.orange);
         setIconImages(null);
 
-        jLabel1.setFont(new java.awt.Font("DejaVu Sans Condensed", 1, 15)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(123, 120, 117));
-        jLabel1.setText("Graylight Otel");
-        jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-
-        personelButon.addActionListener(new java.awt.event.ActionListener() {
+        otelButon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                personelButonActionPerformed(evt);
+                otelButonActionPerformed(evt);
             }
         });
 
@@ -98,51 +100,165 @@ public class programArayuz extends javax.swing.JFrame {
         otel_logo.setMaximumSize(new java.awt.Dimension(175, 88));
         otel_logo.setMinimumSize(new java.awt.Dimension(175, 88));
 
+        musteriTab.setText("Müşteri");
+        musteriTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                musteriTabActionPerformed(evt);
+            }
+        });
+
+        muhasebeTab.setText("Muhasebe");
+        muhasebeTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                muhasebeTabActionPerformed(evt);
+            }
+        });
+
+        roomTab.setText("Oda");
+        roomTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                roomTabActionPerformed(evt);
+            }
+        });
+
+        personelTab.setText("Personel");
+        personelTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                personelTabActionPerformed(evt);
+            }
+        });
+
+        servisTab.setText("Hizmetler");
+        servisTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                servisTabActionPerformed(evt);
+            }
+        });
+
+        demirbasTab.setText("Demirbaşlar");
+        demirbasTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                demirbasTabActionPerformed(evt);
+            }
+        });
+
+        content.setPreferredSize(new java.awt.Dimension(365, 315));
+
+        javax.swing.GroupLayout contentLayout = new javax.swing.GroupLayout(content);
+        content.setLayout(contentLayout);
+        contentLayout.setHorizontalGroup(
+            contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 832, Short.MAX_VALUE)
+        );
+        contentLayout.setVerticalGroup(
+            contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 263, Short.MAX_VALUE)
+        );
+
+        jPanel1.setBackground(new java.awt.Color(1, 117, 164));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1, Short.MAX_VALUE)
+        );
+
+        yildizlar.setPreferredSize(new java.awt.Dimension(208, 32));
+
+        javax.swing.GroupLayout yildizlarLayout = new javax.swing.GroupLayout(yildizlar);
+        yildizlar.setLayout(yildizlarLayout);
+        yildizlarLayout.setHorizontalGroup(
+            yildizlarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 249, Short.MAX_VALUE)
+        );
+        yildizlarLayout.setVerticalGroup(
+            yildizlarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 32, Short.MAX_VALUE)
+        );
+
+        OtelIsim.setFont(new java.awt.Font("DejaVu Sans Condensed", 1, 15)); // NOI18N
+        OtelIsim.setForeground(new java.awt.Color(123, 120, 117));
+        OtelIsim.setText("DENEME");
+        OtelIsim.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabbedPane)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(otel_logo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addComponent(musteriTab)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3)
+                        .addComponent(roomTab)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4)
+                        .addComponent(muhasebeTab)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(personelTab)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(servisTab)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(demirbasTab)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 492, Short.MAX_VALUE)
-                        .addComponent(personelButon)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(firsatButon)
-                        .addGap(9, 9, 9)
-                        .addComponent(jButton2)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(otel_logo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(OtelIsim)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(otelButon)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(firsatButon)
+                                        .addGap(9, 9, 9)
+                                        .addComponent(jButton2))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(yildizlar, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE)))))
+                        .addContainerGap())))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(content, javax.swing.GroupLayout.DEFAULT_SIZE, 832, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(personelButon)
-                    .addComponent(firsatButon)
-                    .addComponent(jButton2)
-                    .addComponent(otel_logo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4))))
-                .addGap(26, 26, 26)
-                .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE))
+                        .addGap(24, 24, 24)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(otelButon)
+                            .addComponent(firsatButon)
+                            .addComponent(jButton2)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(otel_logo, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(OtelIsim)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(yildizlar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(musteriTab)
+                    .addComponent(roomTab)
+                    .addComponent(muhasebeTab)
+                    .addComponent(personelTab)
+                    .addComponent(servisTab)
+                    .addComponent(demirbasTab))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(content, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE))
         );
 
         pack();
@@ -161,7 +277,7 @@ public class programArayuz extends javax.swing.JFrame {
         frame.setAlwaysOnTop(true);
     }//GEN-LAST:event_firsatButonActionPerformed
 
-    private void personelButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_personelButonActionPerformed
+    private void otelButonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_otelButonActionPerformed
         // TODO add your handling code here:
 
         JFrame frame = new JFrame("Otel Bilgileri");
@@ -172,8 +288,56 @@ public class programArayuz extends javax.swing.JFrame {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setAlwaysOnTop(true);
-    }//GEN-LAST:event_personelButonActionPerformed
+        frame.addWindowListener(new java.awt.event.WindowAdapter() { 
+        @Override 
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 
+          otelBilgileriniGuncelle(); 
+
+        }
+
+           
+    
+    }); 
+    }//GEN-LAST:event_otelButonActionPerformed
+
+     private void otelBilgileriniGuncelle() {  
+     db.dbBaglan();
+     Statement st=dbConnection.getSt();
+        
+        try {
+            ResultSet rs=st.executeQuery("SELECT * FROM otel_bilgileri");
+            int yildizSayisi=0;
+            while(rs.next())
+            {
+                OtelIsim.setText(rs.getString("otel_adi"));
+                yildizSayisi=rs.getInt("otel_yildiz");
+                 
+            }
+            
+            yildizlar.removeAll();
+            
+            for(int i=0;i<yildizSayisi;i++){
+                
+                JLabel yildiz= new JLabel();
+                yildiz.setBounds(32*i, 0, 32, 32);
+                yildiz.setIcon(new javax.swing.ImageIcon("src/images/star.png"));
+                yildizlar.add(yildiz);
+                
+            
+            }
+            
+            yildizlar.validate();
+            yildizlar.repaint();
+            st.close();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(otelBilgileri.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         
+         
+     }
+    
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
 
@@ -187,6 +351,76 @@ public class programArayuz extends javax.swing.JFrame {
         frame.setAlwaysOnTop(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void musteriTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_musteriTabActionPerformed
+        // TODO add your handling code here:
+         musteriIslemleri musteri = new musteriIslemleri();
+         updateGUI(musteri,evt.getSource());
+         
+        
+    }//GEN-LAST:event_musteriTabActionPerformed
+
+    private void roomTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roomTabActionPerformed
+        // TODO add your handling code here:
+        
+         odaIslemleri oda =new odaIslemleri();
+         updateGUI(oda,evt.getSource());
+    }//GEN-LAST:event_roomTabActionPerformed
+
+    private void muhasebeTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_muhasebeTabActionPerformed
+        // TODO add your handling code here:
+        
+         muhasebe muhasebe = new muhasebe();
+         updateGUI(muhasebe,evt.getSource());
+    }//GEN-LAST:event_muhasebeTabActionPerformed
+
+    private void personelTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_personelTabActionPerformed
+        // TODO add your handling code here:
+         personelİslemleri personel = new personelİslemleri();
+         updateGUI(personel,evt.getSource());
+    }//GEN-LAST:event_personelTabActionPerformed
+
+    private void servisTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_servisTabActionPerformed
+        // TODO add your handling code here:
+         hizmetler hizmet = new hizmetler();
+         updateGUI(hizmet,evt.getSource());
+    }//GEN-LAST:event_servisTabActionPerformed
+
+    private void demirbasTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_demirbasTabActionPerformed
+        // TODO add your handling code here:
+         demirbaslar demirbas = new demirbaslar();
+         updateGUI(demirbas,evt.getSource());
+         
+        
+    }//GEN-LAST:event_demirbasTabActionPerformed
+
+    private void updateGUI(Object o,Object buton){
+        Color mavi=new Color(28, 105, 168);
+        Color siyah=new Color(49,5,57);
+        
+        
+         Component tab=(Component) o;
+         tab.setBounds(5, 0, 1360, 630);
+         
+         if(eskitab==null){
+         eskitab=(JButton)buton;
+         eskitab.setForeground(mavi);
+         
+         }
+         else{
+              JButton yeni=(JButton) buton;
+              yeni.setForeground(mavi);
+              eskitab.setForeground(siyah);
+              eskitab=yeni;
+         }
+         
+        
+         
+         content.removeAll();
+         content.add(tab);
+         content.validate();
+         content.repaint();
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -223,14 +457,19 @@ public class programArayuz extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel OtelIsim;
+    private javax.swing.JPanel content;
+    private javax.swing.JButton demirbasTab;
     private javax.swing.JButton firsatButon;
     private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton muhasebeTab;
+    private javax.swing.JButton musteriTab;
+    private javax.swing.JButton otelButon;
     private javax.swing.JLabel otel_logo;
-    private javax.swing.JButton personelButon;
-    private javax.swing.JTabbedPane tabbedPane;
+    private javax.swing.JButton personelTab;
+    private javax.swing.JButton roomTab;
+    private javax.swing.JButton servisTab;
+    private javax.swing.JPanel yildizlar;
     // End of variables declaration//GEN-END:variables
 }

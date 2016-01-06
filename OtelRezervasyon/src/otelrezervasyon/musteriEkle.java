@@ -45,7 +45,7 @@ public class musteriEkle extends javax.swing.JFrame {
     private String ikinciTarihText;
     private String onOdemeText;
     private String telefonText;
-    private int secilenOdaText;
+    private int secilenOdaText,toplamOdaUcret;
     private final textKontrolleri kontrol;
     private final dbConnection db;
     private PreparedStatement ps;
@@ -526,7 +526,7 @@ public class musteriEkle extends javax.swing.JFrame {
             sqldate = new java.sql.Date(date.getTime());
 
             Date date2 = formatter.parse(ikinciTarihText);
-            sqldate2 = new java.sql.Date(date.getTime());
+            sqldate2 = new java.sql.Date(date2.getTime());
             
         } catch (ParseException ex) {
             Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
@@ -551,7 +551,7 @@ public class musteriEkle extends javax.swing.JFrame {
                  
                 String sql2="UPDATE  musteri_otel_bilgileri SET ODA_NO="+secilenOdaText
                         +",ON_ODEME_TUTAR="+onOdemeText+ ", BASLANGIC_TARIHI='"+sqldate
-                        +"', BITIS_TARIHI='"+sqldate2+"', ILISKI_KESIM=false, KONAK_SAYISI="+(konaksayisi+1)
+                        +"', BITIS_TARIHI='"+sqldate2+"',TOPLAM_ODA_UCRET="+toplamOdaUcret+" ILISKI_KESIM=false, KONAK_SAYISI="+(konaksayisi+1)
                         + " WHERE musteri_id="+id;
                 
                 ps =dbConnection.getCon().prepareStatement(sql2);
@@ -576,7 +576,7 @@ public class musteriEkle extends javax.swing.JFrame {
               
                 String sql2="Insert INTO musteri_otel_bilgileri (MUSTERI_ID,ODA_NO,"
                         + "ON_ODEME_TUTAR,BASLANGIC_TARIHI,BITIS_TARIHI,"
-                        + "ILISKI_KESIM,KONAK_SAYISI) VALUES (?,?,?,?,?,?,?)";
+                        + "ILISKI_KESIM,KONAK_SAYISI,TOPLAM_ODA_UCRET) VALUES (?,?,?,?,?,?,?,?)";
 
                 ps =dbConnection.getCon().prepareStatement(sql2);
                 ps.setInt(1, id);
@@ -586,7 +586,10 @@ public class musteriEkle extends javax.swing.JFrame {
                 ps.setDate(5, sqldate2);
                 ps.setBoolean(6, false);
                 ps.setInt(7, 5);
+                ps.setInt(8, toplamOdaUcret);
                 ps.execute();
+                
+                
             }
             dbConnection.getCon().close();
             
@@ -788,7 +791,7 @@ public class musteriEkle extends javax.swing.JFrame {
                final int a = fiyat;
                final int kapasiteOda=kapasite;
                final String turOda=tur;
-                              
+                toplamOdaUcret= (int) (toplamGun*a);   
                 ActionListener ac=new ActionListener() {
                    @Override
                    public void actionPerformed(ActionEvent ae) {
@@ -797,7 +800,7 @@ public class musteriEkle extends javax.swing.JFrame {
                            if(odaBos){
                             onOdeme.setText((toplamGun*a*15/100)+"");
                             odaUcret.setText(a+"₺");
-                            toplamUcret.setText(toplamGun*a+"");
+                            toplamUcret.setText(toplamOdaUcret+"");
                             secilenOda.setText(""+odaNo);
                             secilenOdaText=Integer.valueOf(odaNo);
                             //kisiSayisi.setText(kapasiteOda+"");
@@ -1224,9 +1227,6 @@ public class musteriEkle extends javax.swing.JFrame {
         else{
         musteriKaydet();
         }
-        
-       
-        
         
         
     }//GEN-LAST:event_kaydetActionPerformed
