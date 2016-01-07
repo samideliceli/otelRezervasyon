@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -23,16 +25,19 @@ import static otelrezervasyon.dbConnection.con;
 import static otelrezervasyon.dbConnection.st;
 
 public class odaIslemleri extends javax.swing.JPanel {
-    
+
     private dbConnection db;
     private DefaultListModel dlm, dlm2, dlm3;
-    
+    private HashMap<Integer, Integer> bedel;
+    private int servisBedel = 0, demirbasBedel = 0, demirbasBedeli1 = 0;
+
     public odaIslemleri() {
         initComponents();
         db = new dbConnection();
         dlm = new DefaultListModel();
         dlm2 = new DefaultListModel();
         dlm3 = new DefaultListModel();
+        bedel = new HashMap<Integer, Integer>();
         odaDemirbaslar.setModel(dlm);
         odaServisler.setModel(dlm2);
         hasarListesi.setModel(dlm3);
@@ -55,7 +60,7 @@ public class odaIslemleri extends javax.swing.JPanel {
             Logger.getLogger(odaIslemleri.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void servisleriCek() {
         try {
             db.dbBaglan();
@@ -71,23 +76,23 @@ public class odaIslemleri extends javax.swing.JPanel {
             Logger.getLogger(muhasebe.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void bosOdalariDoldur() throws SQLException {
-        
+
         Color background;
-        
+
         int eskiKat = 0;
         try {
             String sql = "SELECT oda_no,kat,tip_id FROM oda";
-            
+
             ResultSet rs = st.executeQuery(sql);
-            
+
             while (rs.next()) {
                 final String odaNo = rs.getString("oda_no");
                 int kat = Integer.valueOf(odaNo.substring(0, 1));
-                
+
                 int sira = Integer.valueOf(odaNo) - (kat * 100);
-                
+
                 if (eskiKat != kat) {
                     JLabel katText = new JLabel();
                     katText.setText("KAT " + kat);
@@ -97,33 +102,33 @@ public class odaIslemleri extends javax.swing.JPanel {
                     eskiKat = kat;
                     jPanel7.add(katText);
                 }
-                
+
                 final boolean musBos = odaBosmu(Integer.valueOf(odaNo), "musteri_otel_bilgileri");
-                
+
                 if (musBos) {
                     background = new Color(91, 155, 30);
                 } else {
                     background = new Color(189, 54, 47);
                 }
-                
+
                 final String odaTip = rs.getString("tip_id");
                 int fiyat = 0;
                 String tur = "---";
                 int kapasite = 0;
-                
+
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery("SELECT fiyat,kapasite FROM oda_tipi WHERE tip_id=" + odaTip);
-                
+
                 try {
                     while (rs2.next()) {
                         fiyat = rs2.getInt("fiyat");
                         kapasite = rs2.getInt("kapasite");
-                        
+
                     }
                 } finally {
                     rs2.close();
                 }
-                
+
                 final int a = fiyat;
                 ActionListener ac = new ActionListener() {
                     @Override
@@ -157,7 +162,7 @@ public class odaIslemleri extends javax.swing.JPanel {
                         String servis = servisTurleri.getSelectedItem().toString();
                         String sql2 = "SELECT SERVIS FROM SERVIS_KULLANAN WHERE ODA_NO =  (?)";
                         String sql3 = "SELECT ISIM FROM HASAR_LISTESI WHERE ODA_NO = (?)";
-                        
+
                         if (musBos) {
                             try {
                                 odaDemirbaslar.setEnabled(false);
@@ -213,73 +218,73 @@ public class odaIslemleri extends javax.swing.JPanel {
                             } catch (SQLException ex) {
                                 Logger.getLogger(odaIslemleri.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            
+
                         }
                     }
                 };
-                
+
                 JButton oda = new JButton();
-                
+
                 oda.setText(odaNo);
-                
+
                 oda.setForeground(Color.WHITE);
-                
+
                 oda.setBackground(background);
-                
+
                 oda.setBounds(
                         (55 * sira) + 10, 30 + ((kat - 1) * 60), 55, 30);
                 jPanel7.add(oda);
-                
+
                 oda.addActionListener(ac);
             }
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(musteriEkle.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private boolean odaBosmu(int odaNo, String tablo) {
-        
+
         st = dbConnection.getSt();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         ResultSet rs3 = null;
-        
+
         java.sql.Date sqldate2 = null, sqldate = null;
         try {
             Date date = new Date();
             String date2 = formatter.format(date.getTime());
             Date datex = formatter.parse(date2);
             sqldate = new java.sql.Date(datex.getTime());
-            
+
         } catch (ParseException ex) {
             Logger.getLogger(musteriIslemleri.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         try {
             Statement st2 = con.createStatement();
-            
+
             st2 = dbConnection.getCon().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             rs3 = st2.executeQuery("SELECT oda_no FROM musteri_otel_bilgileri where ("
-                    + "baslangic_tarihi >= '" + sqldate + "' AND bitis_tarihi <='" + sqldate + "') and oda_no=" + odaNo);
-            
+                    + "baslangic_tarihi <= '" + sqldate + "' AND bitis_tarihi >='" + sqldate + "') and oda_no=" + odaNo);
+
             int i = 0;
             while (rs3.next()) {
                 i++;
-                
+
             }
-            
+
             return i == 0;
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(musteriEkle.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return false;
-        
+
     }
-    
+
     public void demirbaslariCek() {
         try {
             db.dbBaglan();
@@ -291,13 +296,13 @@ public class odaIslemleri extends javax.swing.JPanel {
                 demirbasTurleri.addItem(ps.getResultSet().getString("ISIM"));
             }
             con.close();
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(muhasebe.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -647,9 +652,9 @@ public class odaIslemleri extends javax.swing.JPanel {
             } else {
                 JOptionPane.showMessageDialog(null, "Demirbaş Odada Zaten Mevcut!");
             }
-            
+
             con.close();
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(odaIslemleri.class
                     .getName()).log(Level.SEVERE, null, ex);
@@ -692,7 +697,7 @@ public class odaIslemleri extends javax.swing.JPanel {
             } else {
                 JOptionPane.showMessageDialog(null, "Demirbaş Zaten Hasar Listesinde!");
             }
-            
+
             con.close();
         } catch (SQLException ex) {
             Logger.getLogger(odaIslemleri.class.getName()).log(Level.SEVERE, null, ex);
