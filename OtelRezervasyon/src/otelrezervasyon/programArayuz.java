@@ -24,6 +24,7 @@ public class programArayuz extends javax.swing.JFrame {
     /**
      * Creates new form programArayuz
      */
+    static String otelAdi;
     JButton eskitab=null;
     private dbConnection db;
     public programArayuz() {
@@ -293,6 +294,7 @@ public class programArayuz extends javax.swing.JFrame {
         public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 
           otelBilgileriniGuncelle(); 
+          
 
         }
 
@@ -312,6 +314,8 @@ public class programArayuz extends javax.swing.JFrame {
             {
                 OtelIsim.setText(rs.getString("otel_adi"));
                 yildizSayisi=rs.getInt("otel_yildiz");
+                
+                 otelAdi=rs.getString("otel_adi");
                  
             }
             

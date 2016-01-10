@@ -6,31 +6,19 @@
 package otelrezervasyon;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import static otelrezervasyon.dbConnection.con;
 
@@ -48,6 +36,8 @@ public class musteriIslemleri extends javax.swing.JPanel {
     String ilkTelefon;
     int toplam_oda_ucret,on_odeme;
     int musteriID;
+    static String tc;
+    
     SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
     /**
      * Creates new form musteriIslemleri
@@ -77,7 +67,8 @@ public class musteriIslemleri extends javax.swing.JPanel {
         iliskiRadio.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent ıe) {
-            isSelected=!isSelected;
+                
+                isSelected=!isSelected;
             
             }
         });
@@ -368,12 +359,12 @@ public class musteriIslemleri extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1232, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1238, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, Short.MAX_VALUE)))
-                .addGap(6, 6, 6))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 446, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -513,7 +504,9 @@ public class musteriIslemleri extends javax.swing.JPanel {
        int i= jComboBox1.getSelectedIndex();
        
        if(i==0){
-        ilisikKes.setEnabled(true);
+        
+       
+           
         musteriAd.setEnabled(true);
         musteriMail.setEnabled(true);
         musteriSoyad.setEnabled(true);
@@ -525,6 +518,14 @@ public class musteriIslemleri extends javax.swing.JPanel {
             db.dbBaglan();
             String sql2=" SELECT musteri.musteri_id,ad,soyad,cinsiyet,tc,telefon,email,oda_no,on_odeme_tutar,baslangic_tarihi,bitis_tarihi,"
                     + "konak_sayisi,toplam_oda_ucret FROM musteri,musteri_otel_bilgileri WHERE musteri.musteri_id=musteri_otel_bilgileri.musteri_id";
+            
+             if(!iliskiRadio.isSelected()){
+                ilisikKes.setEnabled(true);
+                sql2=sql2+" AND iliski_kesim=false";
+                }else{
+                    ilisikKes.setEnabled(false);
+                }   
+            
             PreparedStatement ps = con.prepareStatement(sql2, ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
             ps.executeQuery();
@@ -543,6 +544,9 @@ public class musteriIslemleri extends javax.swing.JPanel {
             musteriTelefon.setText(ps.getResultSet().getString("TELEFON"));
             onOdeme.setText(ps.getResultSet().getString("on_odeme_tutar"));
             musteriID=ps.getResultSet().getInt("Musteri_id");
+            
+            tc=ps.getResultSet().getString("TC");
+            
             
             guncelle.setEnabled(true);
         } catch (SQLException ex) {
@@ -687,49 +691,29 @@ public class musteriIslemleri extends javax.swing.JPanel {
     }//GEN-LAST:event_guncelleActionPerformed
 
     private void ilisikKesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ilisikKesActionPerformed
-        // TODO add your handling code here:
-        try {
-                PreparedStatement ps;
-                
-                String sql2="UPDATE  musteri_otel_bilgileri SET iliski_kesim=true WHERE musteri_id="+musteriID;
-                
-                ps =dbConnection.getCon().prepareStatement(sql2);
-                ps.execute();
-                
-                
-                t.tabloyuOlustur(sql, veri, tb);
-                musteriTablo.setModel(tb);
-                
-                final BufferedImage image = new BufferedImage(
-                this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                Graphics gr = image.getGraphics();
-                this.printAll(gr);
-                gr.dispose();
-                
-                ImageIO.write(image, "PNG", new File(musteriID+""));
-                PrinterJob printJob = PrinterJob.getPrinterJob();
-                printJob.setPrintable(new Printable() {
-                        @Override
-                        public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-                                if (pageIndex != 0) {
-                                    return NO_SUCH_PAGE;
-                                }
-                                graphics.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
-                                return PAGE_EXISTS;
-                        }
-                });     
-                try {
-                    printJob.print();
-                } catch (PrinterException e1) {             
-                    e1.printStackTrace();
-                }
-                
-            } catch (SQLException ex) {
-                Logger.getLogger(musteriIslemleri.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-            Logger.getLogger(musteriIslemleri.class.getName()).log(Level.SEVERE, null, ex);
+    
+    ilisikKesme frame = new ilisikKesme();
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    frame.pack();
+    frame.setAlwaysOnTop(true);
+    frame.setLocationRelativeTo(null);
+    frame.addWindowListener(new java.awt.event.WindowAdapter() { 
+        @Override 
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+
+            t.tabloyuOlustur(sql, veri, tb);
+            musteriTablo.setModel(tb);
+
         }
+    
+    }); 
+    frame.setVisible(true);
         
+
+
+
+// TODO add your handling code here:
+       
         
         
     }//GEN-LAST:event_ilisikKesActionPerformed
