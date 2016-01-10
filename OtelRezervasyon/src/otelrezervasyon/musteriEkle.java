@@ -97,7 +97,7 @@ public class musteriEkle extends javax.swing.JFrame {
                         kisiSayisiCombo.removeAllItems();
 
                         st=dbConnection.getSt();
-                        rs=st.executeQuery("SELECT kapasite FROM oda_tipi "
+                        ResultSet rs=st.executeQuery("SELECT kapasite FROM oda_tipi "
                                 + "WHERE tur='"+"Normal"+"'"+" ORDER BY kapasite ASC");
 
 
@@ -197,9 +197,9 @@ public class musteriEkle extends javax.swing.JFrame {
                     
                     try {
                         
-                        st=dbConnection.getSt();
-                        rs=st.executeQuery("SELECT ad,soyad,cinsiyet,telefon,email FROM musteri "
-                                + "WHERE tc='"+tcText+"'");
+                        st=dbConnection.getCon().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        rs=st.executeQuery("SELECT ad, soyad, cinsiyet, telefon, email FROM musteri"
+                                + " WHERE tc='"+tcText+"'");
                         int i=0;
                         
                         while(rs.next())
@@ -253,7 +253,7 @@ public class musteriEkle extends javax.swing.JFrame {
                            
                             isim.setEnabled(false);
                             soyisim.setText(soyIsimText);
-                            soyisim.setEnabled(false);;
+                            soyisim.setEnabled(false);
                             telefon.setText(telefonText);
                             telefon.setEnabled(false);
                             email.setEnabled(false);
@@ -286,6 +286,7 @@ public class musteriEkle extends javax.swing.JFrame {
                             telefon.setText(telefonText);
                             telefon.setEnabled(false);
                             email.setEnabled(false);
+                            kaydet.setEnabled(false);
                            
                            }
                         
@@ -423,7 +424,7 @@ public class musteriEkle extends javax.swing.JFrame {
         
         st=dbConnection.getSt();
         try {
-            rs=st.executeQuery("SELECT * FROM musteri WHERE tc='"+tcText+"'");  
+            ResultSet rs=st.executeQuery("SELECT * FROM musteri WHERE tc='"+tcText+"'");  
             
             while(rs.next())
             {
@@ -467,7 +468,7 @@ public class musteriEkle extends javax.swing.JFrame {
         
         st=dbConnection.getSt();
         try {
-            rs=st.executeQuery("SELECT iliski_kesim FROM musteri_otel_bilgileri WHERE musteri_id="+id);  
+           ResultSet rs=st.executeQuery("SELECT iliski_kesim FROM musteri_otel_bilgileri WHERE musteri_id="+id);  
             
             while(rs.next())
             {
@@ -487,7 +488,7 @@ public class musteriEkle extends javax.swing.JFrame {
                    
          st=dbConnection.getSt();
         try {
-            rs=st.executeQuery("SELECT * FROM rezervasyon WHERE tc='"+tc+"'");  
+            ResultSet rs=st.executeQuery("SELECT * FROM rezervasyon WHERE tc='"+tc+"'");  
             int i=0;
             while(rs.next())
             {
@@ -551,7 +552,7 @@ public class musteriEkle extends javax.swing.JFrame {
                  
                 String sql2="UPDATE  musteri_otel_bilgileri SET ODA_NO="+secilenOdaText
                         +",ON_ODEME_TUTAR="+onOdemeText+ ", BASLANGIC_TARIHI='"+sqldate
-                        +"', BITIS_TARIHI='"+sqldate2+"',TOPLAM_ODA_UCRET="+toplamOdaUcret+" ILISKI_KESIM=false, KONAK_SAYISI="+(konaksayisi+1)
+                        +"', BITIS_TARIHI='"+sqldate2+"',TOPLAM_ODA_UCRET="+toplamOdaUcret+", ILISKI_KESIM=false, KONAK_SAYISI="+(konaksayisi+1)
                         + " WHERE musteri_id="+id;
                 
                 ps =dbConnection.getCon().prepareStatement(sql2);
@@ -585,7 +586,7 @@ public class musteriEkle extends javax.swing.JFrame {
                 ps.setDate(4,  sqldate);
                 ps.setDate(5, sqldate2);
                 ps.setBoolean(6, false);
-                ps.setInt(7, 5);
+                ps.setInt(7, 0);
                 ps.setInt(8, toplamOdaUcret);
                 ps.execute();
                 
@@ -608,8 +609,8 @@ public class musteriEkle extends javax.swing.JFrame {
     
         
         String sql="Insert INTO rezervasyon (AD,SOYAD,CINSIYET,TC,TELEFON,"
-                + "EMAIL,BASLANGIC_TARIHI,BITIS_TARIHI,ODEME_TUTARI,ODA_NO) "
-                + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+                + "EMAIL,BASLANGIC_TARIHI,BITIS_TARIHI,ODEME_TUTARI,ODA_NO,TOPLAM_ODA_UCRET) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         
         String sql3 = ("INSERT INTO GELIR (GELIR_TURU,TARIH,GELIR) VALUES (?,?,?)");
         
@@ -649,6 +650,7 @@ public class musteriEkle extends javax.swing.JFrame {
             ps.setDate(8, sqldate2);
             ps.setInt(9,Integer.valueOf(onOdemeText));
             ps.setInt(10, secilenOdaText);
+            ps.setInt(11,toplamOdaUcret);
             ps.executeUpdate();
             
             
@@ -698,17 +700,23 @@ public class musteriEkle extends javax.swing.JFrame {
         
         try {
             st2 = dbConnection.getCon().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-  
-            rs3=st2.executeQuery("SELECT oda_no FROM "+tablo+" WHERE "
+            String sql="SELECT oda_no FROM "+tablo+" WHERE "
                     + "(baslangic_tarihi>='"+sqldate+"' AND bitis_tarihi<='"+sqldate2+"') "
-            +"AND oda_no="+odaNo);  
-           
+                    +"AND oda_no="+odaNo;
+            
+            
+            
+            if(tablo.equals("musteri_otel_bilgileri")){
+            
+                sql=sql+" AND iliski_kesim=false";
+            }
+            rs3=st2.executeQuery(sql);  
+            
            int i=0;
             while(rs3.next())
             {
               i++;
-               
-               
+                              
             }
             
             return i==0;
@@ -733,7 +741,7 @@ public class musteriEkle extends javax.swing.JFrame {
         try {  
             String sql="SELECT oda_no,kat,tip_id FROM oda";
             
-            rs=st.executeQuery(sql);
+            ResultSet rs=st.executeQuery(sql);
             
             while(rs.next())
             {

@@ -174,7 +174,7 @@ public class programArayuz extends javax.swing.JFrame {
         yildizlar.setLayout(yildizlarLayout);
         yildizlarLayout.setHorizontalGroup(
             yildizlarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 249, Short.MAX_VALUE)
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         yildizlarLayout.setVerticalGroup(
             yildizlarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -208,7 +208,7 @@ public class programArayuz extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(otel_logo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -222,7 +222,7 @@ public class programArayuz extends javax.swing.JFrame {
                                         .addGap(9, 9, 9)
                                         .addComponent(jButton2))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(yildizlar, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(yildizlar, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(0, 0, Short.MAX_VALUE)))))
                         .addContainerGap())))
             .addGroup(layout.createSequentialGroup()
